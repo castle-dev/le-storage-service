@@ -9,6 +9,7 @@ A small library providing utility methods to `escape` and `unescape` HTML entiti
 
 ## Usage
 
+```
   var ConverterService = require('converter'),
       converter = new ConverterService(),
       escape = converter.escape,
@@ -19,6 +20,7 @@ A small library providing utility methods to `escape` and `unescape` HTML entiti
       unescaped = unescape(escaped);
 
   console.log('html', html, 'escaped', escaped, 'unescaped', unescaped);
+```
 
 ## Tests
 
