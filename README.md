@@ -3,6 +3,8 @@ le-converter-service
 
 A small library providing utility methods to `escape` and `unescape` HTML entities
 
+![Build Status](https://api.travis-ci.org/castle-dev/le-converter-service.svg?branch=develop "Build Status")
+
 ## Installation
 
   npm install le-converter-service --save
