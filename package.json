@@ -1,0 +1,28 @@
+{
+  "name": "le-converter-service",
+  "version": "0.0.0",
+  "description": "A small library for converting between various formats",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo 'Error: no test specified' && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/castle-dev/le-converter-service.git"
+  },
+  "keywords": [
+    "parse",
+    "convert",
+    "format"
+  ],
+  "author": "Scott Lowe <scott@entercastle.com> (http://scottdlowe.com/)",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/castle-dev/le-converter-service/blob/master/LICENSE-MIT"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/castle-dev/le-converter-service/issues"
+  }
+}
