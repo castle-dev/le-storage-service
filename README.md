@@ -5,6 +5,8 @@ A small library providing utility methods to `escape` and `unescape` HTML entiti
 
 ![Build Status](https://api.travis-ci.org/castle-dev/le-converter-service.svg?branch=develop "Build Status")
 
+[![Dependency Status](https://david-dm.org/castle-dev/le-converter-service.svg)](https://david-dm.org/castle-dev/le-converter-service)
+
 ## Installation
 
   npm install le-converter-service --save
