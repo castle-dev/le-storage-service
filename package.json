@@ -4,7 +4,7 @@
   "description": "A small library for converting between various formats",
   "main": "index.js",
   "scripts": {
-    "test": "echo 'Error: no test specified' && exit 1"
+    "test": "gulp test:unit"
   },
   "repository": {
     "type": "git",
