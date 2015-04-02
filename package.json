@@ -24,5 +24,13 @@
   ],
   "bugs": {
     "url": "https://github.com/castle-dev/le-converter-service/issues"
+  },
+  "devDependencies": {
+    "chai": "^2.2.0",
+    "gulp": "^3.8.11",
+    "gulp-mocha": "^2.0.1",
+    "gulp-util": "^3.0.4",
+    "mocha": "^2.2.1",
+    "run-sequence": "^1.0.2"
   }
 }
