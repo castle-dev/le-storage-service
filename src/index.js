@@ -6,6 +6,10 @@
  * @returns {Function} converter.unescape
  */
 var ConverterService = function () {
+  /**
+   * Strips html from a string
+   * @param {String} html
+   */
   this.escape = function(html) {
     return String(html)
       .replace(/&/g, '&amp;')
@@ -14,6 +18,10 @@ var ConverterService = function () {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   };
+  /**
+   * Adds html back to an escaped string
+   * @param {String} html
+   */
   this.unescape = function(html) {
     return String(html)
       .replace(/&amp;/g, '&')
