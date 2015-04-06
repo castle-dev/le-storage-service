@@ -1,10 +1,13 @@
 /**
- * Escape special characters in the given string of html.
- *
- * @param  {String} html
- * @return {String}
+ * Builds converter objects
+ * @constructor
+ * @returns {Object} converter
  */
-module.exports = function () {
+var ConverterService = function () {
+  /**
+   * Strips html from a string
+   * @param {String} html the html string to be escaped
+   */
   this.escape = function(html) {
     return String(html)
       .replace(/&/g, '&amp;')
@@ -13,6 +16,10 @@ module.exports = function () {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   };
+  /**
+   * Adds html back to an escaped string
+   * @param {String} html the string to unescape
+   */
   this.unescape = function(html) {
     return String(html)
       .replace(/&amp;/g, '&')
@@ -22,3 +29,5 @@ module.exports = function () {
       .replace(/&gt;/g, '>');
   };
 };
+
+module.exports = ConverterService;

@@ -2,8 +2,20 @@
 
 var gulp = require('gulp');
 var util = require('gulp-util');
+var jsdoc = require('gulp-jsdoc');
+var clean = require('gulp-clean');
 var runSequence = require('run-sequence');
 var mocha = require('gulp-mocha');
+
+gulp.task('clean', function () {
+  return gulp.src('docs', { read : false })
+  .pipe(clean());
+})
+
+gulp.task('docs', function () {
+  return gulp.src('src/**/*.js')
+  .pipe(jsdoc('./docs', { path: 'ink-docstrap', theme: 'cyborg' }));
+});
 
 gulp.task('test:unit', function () {
   return gulp.src('test/unit/**/*.js', {read: false})
@@ -11,11 +23,13 @@ gulp.task('test:unit', function () {
   .on('error', util.log);
 });
 
-gulp.task('watch:unit', function () {
-  gulp.watch(['app/**', 'test/**'], ['test:unit']);
+gulp.task('watch', function () {
+  gulp.watch(['src/**/*.js'], ['test:unit', 'docs']);
+  gulp.watch(['test/**/*.js'], ['test:unit']);
 })
 
 gulp.task('tdd', function (done) {
-  runSequence('test:unit', 'watch:unit', done)
+  runSequence('test:unit', 'watch', done)
 });
 
+gulp.task('test', ['test:unit']);

@@ -1,5 +1,5 @@
 var should = require('chai').should(),
-    ConverterService = require('../../index.js'),
+    ConverterService = require('../../src/index.js'),
     converter = new ConverterService();
     escape = converter.escape,
     unescape = converter.unescape;
