@@ -14,7 +14,7 @@ gulp.task('clean', function () {
 
 gulp.task('docs', function () {
   return gulp.src('src/**/*.js')
-  .pipe(jsdoc('./docs'));
+  .pipe(jsdoc('./docs', { path: 'ink-docstrap', theme: 'cyborg' }));
 });
 
 gulp.task('test:unit', function () {
