@@ -23,12 +23,13 @@ gulp.task('test:unit', function () {
   .on('error', util.log);
 });
 
-gulp.task('watch:unit', function () {
-  gulp.watch(['app/**', 'test/**'], ['test:unit']);
+gulp.task('watch', function () {
+  gulp.watch(['src/**/*.js'], ['test:unit', 'docs']);
+  gulp.watch(['test/**/*.js'], ['test:unit']);
 })
 
 gulp.task('tdd', function (done) {
-  runSequence('test:unit', 'watch:unit', done)
+  runSequence('test:unit', 'watch', done)
 });
 
 gulp.task('test', ['test:unit']);
