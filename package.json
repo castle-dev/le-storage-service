@@ -1,6 +1,6 @@
 {
   "name": "le-converter-service",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A small library for converting between various formats",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,8 @@
   "devDependencies": {
     "chai": "^2.2.0",
     "gulp": "^3.8.11",
+    "gulp-clean": "^0.3.1",
+    "gulp-jsdoc": "^0.1.4",
     "gulp-mocha": "^2.0.1",
     "gulp-util": "^3.0.4",
     "mocha": "^2.2.1",
