@@ -9,7 +9,7 @@ A small library providing utility methods to `escape` and `unescape` HTML entiti
 
 ## Installation
 
-  npm install le-converter-service --save
+  `npm install le-converter-service --save`
 
 ## Usage
 
@@ -40,4 +40,4 @@ Please follow the project's [conventions](https://github.com/castle-dev/le-conve
 * 0.1.3 Configure Travis CI to publish docs to GitHub Pages
 * 0.1.2 Add Dependency Status Badge
 * 0.1.1 Add Travis CI
-* 0.1.0 Initial release
+z 0.1.0 Initial release
