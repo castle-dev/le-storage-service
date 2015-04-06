@@ -1,10 +1,11 @@
 /**
- * Escape special characters in the given string of html.
- *
- * @param  {String} html
- * @return {String}
+ * Builds converter objects
+ * @constructor
+ * @returns {Object} converter
+ * @returns {Function} converter.escape
+ * @returns {Function} converter.unescape
  */
-module.exports = function () {
+var ConverterService = function () {
   this.escape = function(html) {
     return String(html)
       .replace(/&/g, '&amp;')
@@ -22,3 +23,5 @@ module.exports = function () {
       .replace(/&gt;/g, '>');
   };
 };
+
+module.exports = ConverterService;
