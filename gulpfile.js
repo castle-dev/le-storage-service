@@ -30,3 +30,5 @@ gulp.task('watch:unit', function () {
 gulp.task('tdd', function (done) {
   runSequence('test:unit', 'watch:unit', done)
 });
+
+gulp.task('test', ['test:unit']);
