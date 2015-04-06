@@ -2,7 +2,7 @@
   "name": "le-converter-service",
   "version": "0.1.3",
   "description": "A small library for converting between various formats",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "gulp test:unit"
   },
