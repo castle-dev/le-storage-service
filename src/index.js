@@ -2,13 +2,11 @@
  * Builds converter objects
  * @constructor
  * @returns {Object} converter
- * @returns {Function} converter.escape
- * @returns {Function} converter.unescape
  */
 var ConverterService = function () {
   /**
    * Strips html from a string
-   * @param {String} html
+   * @param {String} html the html string to be escaped
    */
   this.escape = function(html) {
     return String(html)
@@ -20,7 +18,7 @@ var ConverterService = function () {
   };
   /**
    * Adds html back to an escaped string
-   * @param {String} html
+   * @param {String} html the string to unescape
    */
   this.unescape = function(html) {
     return String(html)
