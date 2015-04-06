@@ -37,4 +37,7 @@ Please follow the project's [conventions](https://github.com/castle-dev/le-conve
 
 ## Release History
 
+* 0.1.3 Configure Travis CI to publish docs to GitHub Pages
+* 0.1.2 Add Dependency Status Badge
+* 0.1.1 Add Travis CI
 * 0.1.0 Initial release
