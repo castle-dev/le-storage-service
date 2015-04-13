@@ -1,33 +1,31 @@
+var RecordService = require('./record-service.js');
+var CollectionService = require('./collection-service.js');
 /**
- * Builds converter objects
- * @constructor
- * @returns {Object} converter
+ * A simple ORM for real-time datastores
+ * @module StorageService
+ * @param {Object} provider the datastore provider which handles reads and writes
+ * @returns {Object} StorageService
  */
-var ConverterService = function () {
+var StorageService = function (provider) {
+  if (!provider) { throw new Error('Provider required.'); }
+  var _provider = provider;
   /**
-   * Strips html from a string
-   * @param {String} html the html string to be escaped
+   * Creates a new record object using the RecordService
+   * @param {string} type the type of record to create
+   * @param {string} id (optional) the id of the record
+   * @returns {Record} record
    */
-  this.escape = function(html) {
-    return String(html)
-      .replace(/&/g, '&amp;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+  this.createRecord = function(type, id) {
+    return new RecordService(_provider, type, id);
   };
   /**
-   * Adds html back to an escaped string
-   * @param {String} html the string to unescape
+   * Creates a new collection object using the CollectionService
+   * @param {string} type the type of record to create
+   * @returns {Collection} collection
    */
-  this.unescape = function(html) {
-    return String(html)
-      .replace(/&amp;/g, '&')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, '\'')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>');
+  this.createCollection = function(type) {
+    return new CollectionService(_provider, type);
   };
 };
 
-module.exports = ConverterService;
+module.exports = StorageService;

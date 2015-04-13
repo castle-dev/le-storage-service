@@ -10,7 +10,7 @@ script:
   - gulp docs
   - cd docs
   - git init
-  - git remote add origin "https://${GH_TOKEN}@github.com/castle-dev/le-converter-service.git"
+  - git remote add origin "https://${GH_TOKEN}@github.com/castle-dev/le-storage-service.git"
   - git checkout -B gh-pages
   - git add .
   - git commit -m "Updating documentation"
