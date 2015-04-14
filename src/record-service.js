@@ -25,7 +25,7 @@ function cloneProperties (obj) {
 }
 /**
  * A tool for interacting with data records
- * @module RecordService
+ * @class RecordService
  * @param {Object} provider the datastore provider which handles reads and writes
  * @param {string} type the type of collection to create
  * @param {string} id (optional) the id of the record
@@ -40,11 +40,17 @@ var RecordService = function (provider, type, id) {
   var _data = {};
   /**
    * Returns this record's type
+   * @function getType
+   * @memberof RecordService
+   * @instance
    * @returns {string} type
    */
   this.getType = function () { return _type; }
   /**
-   * Returns this record's id
+   * Returns this record's type
+   * @function getID
+   * @memberof RecordService
+   * @instance
    * @returns {string} id
    */
   this.getID = function () { return _id; }
@@ -53,6 +59,9 @@ var RecordService = function (provider, type, id) {
    *
    * Sets lastUpdatedAt on every save and
    * createdAt when saving a new record.
+   * @function save
+   * @memberof RecordService
+   * @instance
    * @returns {Promise}
    */
   this.save = function () {
@@ -65,6 +74,9 @@ var RecordService = function (provider, type, id) {
   };
   /**
    * Overwrite the record's data and save in the datastore
+   * @function update
+   * @memberof RecordService
+   * @instance
    * @param {Object} data the record's new data
    * @returns {Promise}
    */
@@ -76,6 +88,10 @@ var RecordService = function (provider, type, id) {
   };
   /**
    * Reads the record's data from the datastore
+   * @function load
+   * @memberof RecordService
+   * @instance
+   * @param {Object} data the record's new data
    * @returns {Promise} promise resolves with the records data
    */
   this.load = function () {
@@ -87,6 +103,9 @@ var RecordService = function (provider, type, id) {
   };
   /**
    * Syncs the record's data from the datastore
+   * @function sync
+   * @memberof RecordService
+   * @instance
    * @param {Function} onDataChanged the callback that receives updates to the record's data
    * @returns {Promise} promise resolves with the record's data
    */
@@ -99,6 +118,9 @@ var RecordService = function (provider, type, id) {
   };
   /**
    * Removes the record's sync listener
+   * @function unsync
+   * @memberof RecordService
+   * @instance
    */
   this.unsync = function () {
     _provider.unsync(pluralize(toCamelCase(_type)), _id);
@@ -106,19 +128,22 @@ var RecordService = function (provider, type, id) {
   /**
    * Gives this record the ability to link and traverse one related object
    *
-   * After calling this, the record will have hasType(record) and
-   * getType() methods. Example: Calling person.hasOne('Car') will
-   * expose hasCar(car) and getCar() methods on the person record
+   * After calling this, the record will have setType(record) and
+   * getType() methods. Example: Calling person.relateToOne('Car') will
+   * expose setCar(car) and getCar() methods on the person record
+   * @function relateToOne
+   * @memberof RecordService
+   * @instance
    * @param {string} type the type of record this record has one of
    */
-  this.hasOne = function (type) {
+  this.relateToOne = function (type) {
     var service = this;
     this['get' + toSnakeCase(type)] = function () {
       var id = _data[toCamelCase(type) + '_id'];
       var record = new RecordService(_provider, type, id);
       return record;
     }
-    this['has' + toSnakeCase(type)] = function (record) {
+    this['set' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
       _data[toCamelCase(record.getType()) + '_id'] = id;
       return service.save();
@@ -127,12 +152,15 @@ var RecordService = function (provider, type, id) {
   /**
    * Gives this record the ability to link and traverse many related objects
    *
-   * After calling this, the record will have hasType(record) and
-   * getTypes() methods. Example: Calling person.hasMany('Device') will
-   * expose hasDevice(device) and getDevices() methods on the person record
+   * After calling this, the record will have addType(record) and
+   * getTypes() methods. Example: Calling person.relateToMany('Device') will
+   * expose addDevice(device) and getDevices() methods on the person record
+   * @function relateToMany
+   * @memberof RecordService
+   * @instance
    * @param {string} type the type of record this record has one of
    */
-  this.hasMany = function (type) {
+  this.relateToMany = function (type) {
     var _service = this;
     var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function () {
@@ -144,7 +172,7 @@ var RecordService = function (provider, type, id) {
       }
       return _collection;
     }
-    this['has' + toSnakeCase(type)] = function (record) {
+    this['add' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
       var ids = _data[toCamelCase(record.getType()) + '_ids'];
       if(!ids || !ids.length) {

@@ -14,7 +14,7 @@ function toCamelCase (string) {
 }
 /**
  * A tool for interacting with collections of data
- * @module CollectionService
+ * @class CollectionService
  * @param {Object} provider the datastore provider which handles reads and writes
  * @param {string} type the type of collection to create
  * @returns {Collection} collection
@@ -31,7 +31,9 @@ var CollectionService = function (provider, type) {
    * Adds a record to this collection
    *
    * Will automatically sync the record if the collection is synced.
-   * @returns {Record} record
+   * @function addRecord
+   * @memberof CollectionService
+   * @instance
    */
   this.addRecord = function (record) {
     var collection = this;
@@ -46,6 +48,10 @@ var CollectionService = function (provider, type) {
   }
   /**
    * Reads the collection's data from the datastore
+   * @function load
+   * @memberof CollectionService
+   * @instance
+   * @param {Object} data the record's new data
    * @returns {Promise} promise resolves with an array of the collection's data
    */
   this.load = function () {
@@ -64,6 +70,9 @@ var CollectionService = function (provider, type) {
   }
   /**
    * Syncs the collection's data from the datastore
+   * @function sync
+   * @memberof CollectionService
+   * @instance
    * @param {Function} onDataChanged the callback that receives updates to the collection's data
    * @returns {Promise} promise resolves with the collection's data
    */
@@ -80,6 +89,9 @@ var CollectionService = function (provider, type) {
   }
   /**
    * Removes the collection's sync listener
+   * @function unsync
+   * @memberof CollectionService
+   * @instance
    */
   this.unsync = function () {
     for (var i = 0; i < _records.length; i++) {
@@ -89,7 +101,9 @@ var CollectionService = function (provider, type) {
   }
   /**
    * Lookup records in this collection
-   *
+   * @function unsync
+   * @memberof CollectionService
+   * @instance
    * @param {string} sortBy the column name to sort on
    * @param {(string|number)} equalTo the value to filter by
    * @param {number} limit the maximum number of records to find
