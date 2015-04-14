@@ -1,7 +1,11 @@
 le-storage-service
 =========
 
-A simple ORM for real-time datastores
+**A simple ORM for real-time datastores**
+
+This service and the objects it creates rely heavily on promises for asynchronous tasks. A storage
+provider (such as [le-storage-provider-firebase](http://dev.entercastle.com/le-storage-provider-firebase/)) is
+required when constructing the storage object.
 
 ![Build Status](https://api.travis-ci.org/castle-dev/le-storage-service.svg?branch=develop "Build Status")
 
@@ -14,13 +18,22 @@ A simple ORM for real-time datastores
 ## Usage
 
 ```
-  //TODO
+  var StoragePovider = require('le-storage-provider-firebase');
+  var provider = new StorageProvider(/* your firebase url */);
+  var StorageService = require('le-storage-service');
+  var storage = new StorageService(provider);
+
+  var castle = storage.createRecord('Company');
+  castle.update({name: 'Castle', industry: 'Real Estate', founded: 2014})
+  .then(function () {
+    ...
+  });
 ```
 
 ## Tests
 
-  `npm test` to run unit tests once
-  `gulp tdd` to run unit tests on every file change
+* `npm test` to run unit tests once
+* `gulp tdd` to run unit tests on every file change
 
 ## Contributing
 
