@@ -41,6 +41,10 @@ Please follow the project's [conventions](https://github.com/castle-dev/le-stora
 
 ## Release History
 
+* 2.0.0 Purge `has` from the api
+* * Rename `hasOne` to `relateToOne`
+* * Rename `hasMany` to `relateToMany`
+* * Rename `hasType` to `setType` and `addType` for one and many, respectively
 * 1.0.0 Add RecordService and CollectionService
 * 0.1.3 Configure Travis CI to publish docs to GitHub Pages
 * 0.1.2 Add Dependency Status Badge
