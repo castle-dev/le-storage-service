@@ -41,6 +41,7 @@ Please follow the project's [conventions](https://github.com/castle-dev/le-stora
 
 ## Release History
 
+* 2.0.1 Allow `sync` and `load` of empty collections
 * 2.0.0 Purge `has` from the api
 * * Rename `hasOne` to `relateToOne`
 * * Rename `hasMany` to `relateToMany`
