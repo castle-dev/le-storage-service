@@ -55,7 +55,6 @@ var CollectionService = function (provider, type) {
    * @returns {Promise} promise resolves with an array of the collection's data
    */
   this.load = function () {
-    if (!_records || !_records.length) { throw new Error('Cannot load a collection without records'); }
     var promises = [];
     var collectionData = [];
     for (var i = 0; i < _records.length; i++) {

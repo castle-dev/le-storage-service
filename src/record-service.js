@@ -29,7 +29,7 @@ function cloneProperties (obj) {
  * @param {Object} provider the datastore provider which handles reads and writes
  * @param {string} type the type of collection to create
  * @param {string} id (optional) the id of the record
- * @returns {Record} record
+ * @returns {Record}
  */
 var RecordService = function (provider, type, id) {
   if (!provider) { throw new Error('Provider required'); }
@@ -43,7 +43,7 @@ var RecordService = function (provider, type, id) {
    * @function getType
    * @memberof RecordService
    * @instance
-   * @returns {string} type
+   * @returns {string}
    */
   this.getType = function () { return _type; }
   /**
@@ -51,7 +51,7 @@ var RecordService = function (provider, type, id) {
    * @function getID
    * @memberof RecordService
    * @instance
-   * @returns {string} id
+   * @returns {string}
    */
   this.getID = function () { return _id; }
   /**
@@ -91,8 +91,7 @@ var RecordService = function (provider, type, id) {
    * @function load
    * @memberof RecordService
    * @instance
-   * @param {Object} data the record's new data
-   * @returns {Promise} promise resolves with the records data
+   * @returns {Promise} resolves with the record's data
    */
   this.load = function () {
     if (!_id) { throw new Error('Cannot load a record without an id'); }
@@ -107,7 +106,7 @@ var RecordService = function (provider, type, id) {
    * @memberof RecordService
    * @instance
    * @param {Function} onDataChanged the callback that receives updates to the record's data
-   * @returns {Promise} promise resolves with the record's data
+   * @returns {Promise} resolves with the record's data
    */
   this.sync = function (onDataChanged) {
     if (!_id) { throw new Error('Cannot sync a record without an id'); }
@@ -158,7 +157,7 @@ var RecordService = function (provider, type, id) {
    * @function relateToMany
    * @memberof RecordService
    * @instance
-   * @param {string} type the type of record this record has one of
+   * @param {string} type the type of record this record has many of
    */
   this.relateToMany = function (type) {
     var _service = this;
