@@ -18,7 +18,7 @@ required when constructing the storage object.
 ## Usage
 
 ```
-  var StoragePovider = require('le-storage-provider-firebase');
+  var StorageProvider = require('le-storage-provider-firebase');
   var provider = new StorageProvider(/* your firebase url */);
   var StorageService = require('le-storage-service');
   var storage = new StorageService(provider);
