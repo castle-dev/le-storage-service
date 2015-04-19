@@ -51,7 +51,6 @@ var CollectionService = function (provider, type) {
    * @function load
    * @memberof CollectionService
    * @instance
-   * @param {Object} data the record's new data
    * @returns {Promise} promise resolves with an array of the collection's data
    */
   this.load = function () {
