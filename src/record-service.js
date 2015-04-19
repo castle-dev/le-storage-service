@@ -1,4 +1,5 @@
 var pluralize = require('pluralize');
+var q = require('q');
 var CollectionService = require('./collection-service.js');
 function isDate (object) {
   return Object.prototype.toString.call(object) === '[object Date]'
@@ -94,7 +95,7 @@ var RecordService = function (provider, type, id) {
    * @returns {Promise} resolves with the record's data
    */
   this.load = function () {
-    if (!_id) { throw new Error('Cannot load a record without an id'); }
+    if (!_id) { return q.reject(new Error('Cannot load a record without an id')); }
     return _provider.load(pluralize(toCamelCase(_type)), _id)
     .then(function (data) {
      return _data = data;
@@ -109,7 +110,7 @@ var RecordService = function (provider, type, id) {
    * @returns {Promise} resolves with the record's data
    */
   this.sync = function (onDataChanged) {
-    if (!_id) { throw new Error('Cannot sync a record without an id'); }
+    if (!_id) { return q.reject(new Error('Cannot sync a record without an id')); }
     return _provider.sync(pluralize(toCamelCase(_type)), _id, function (data) {
       _data = data;
       onDataChanged(data);
