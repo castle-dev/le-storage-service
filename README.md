@@ -41,11 +41,14 @@ Please follow the project's [conventions](https://github.com/castle-dev/le-stora
 
 ## Release History
 
+* 2.0.3 Prefer `reject` to `throw` for functions that return promises
+* 2.0.2 Remove `data` from `CollectionService`'s `load` in docs
+* 2.0.1 Allow `sync` and `load` of empty collections
 * 2.0.1 Allow `sync` and `load` of empty collections
 * 2.0.0 Purge `has` from the api
-* * Rename `hasOne` to `relateToOne`
-* * Rename `hasMany` to `relateToMany`
-* * Rename `hasType` to `setType` and `addType` for one and many, respectively
+  * Rename `hasOne` to `relateToOne`
+  * Rename `hasMany` to `relateToMany`
+  * Rename `hasType` to `setType` and `addType` for one and many, respectively
 * 1.0.0 Add RecordService and CollectionService
 * 0.1.3 Configure Travis CI to publish docs to GitHub Pages
 * 0.1.2 Add Dependency Status Badge
