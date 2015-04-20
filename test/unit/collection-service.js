@@ -47,8 +47,6 @@ describe('CollectionService', function () {
     var spy = sinon.spy(collection, 'load');
     return collection.load()
     .then(function (loadedData) {
-      console.log(collectionData);
-      console.log(loadedData);
       expect(spy).to.have.been.called;
       expect(loadedData).to.deep.equal(collectionData);
     });
