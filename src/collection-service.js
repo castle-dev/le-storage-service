@@ -37,6 +37,7 @@ var CollectionService = function (provider, type) {
    */
   this.addRecord = function (record) {
     var collection = this;
+    if (!(record instanceof RecordService)) { throw new Error('Only records created by the RecordService can be added'); }
     if (record.getType() !== _type) { throw new Error('Type mismatch'); }
     if (_sync) {
       record.sync(function () {

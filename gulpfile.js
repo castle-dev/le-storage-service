@@ -6,6 +6,7 @@ var jsdoc = require('gulp-jsdoc');
 var clean = require('gulp-clean');
 var runSequence = require('run-sequence');
 var mocha = require('gulp-mocha');
+var cover = require('gulp-coverage');
 
 gulp.task('clean', function () {
   return gulp.src('docs', { read : false })
@@ -21,6 +22,18 @@ gulp.task('test:unit', function () {
   return gulp.src('test/unit/**/*.js', {read: false})
   .pipe(mocha({reporter: 'nyan'}))
   .on('error', util.log);
+});
+
+gulp.task('coverage', function () {
+  return gulp.src(['test/unit/**/*.js'], { read: false })
+  .pipe(cover.instrument({
+    pattern: ['src/**/*.js'],
+    debugDirectory: 'debug'
+  }))
+  .pipe(mocha())
+  .pipe(cover.gather())
+  .pipe(cover.format())
+  .pipe(gulp.dest('reports'));
 });
 
 gulp.task('watch', function () {

@@ -82,6 +82,7 @@ var RecordService = function (provider, type, id) {
    * @returns {Promise}
    */
   this.update = function (data) {
+    if (!data) { return q.reject(new Error('Data required')); }
     var createdAt = _data.createdAt;
     _data = data;
     _data.createdAt = createdAt;
