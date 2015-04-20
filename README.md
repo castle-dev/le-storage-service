@@ -34,6 +34,7 @@ required when constructing the storage object.
 
 * `npm test` to run unit tests once
 * `gulp tdd` to run unit tests on every file change
+* `gulp coverage` to run unit tests and create a code coverage report
 
 ## Contributing
 

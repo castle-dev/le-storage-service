@@ -26,9 +26,11 @@
     "url": "https://github.com/castle-dev/le-storage-service/issues"
   },
   "devDependencies": {
+    "blanket": "^1.1.6",
     "chai": "^2.2.0",
     "gulp": "^3.8.11",
     "gulp-clean": "^0.3.1",
+    "gulp-coverage": "^0.3.34",
     "gulp-jsdoc": "^0.1.4",
     "gulp-mocha": "^2.0.1",
     "gulp-util": "^3.0.4",
