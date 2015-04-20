@@ -33,7 +33,9 @@
     "gulp-mocha": "^2.0.1",
     "gulp-util": "^3.0.4",
     "mocha": "^2.2.1",
-    "run-sequence": "^1.0.2"
+    "run-sequence": "^1.0.2",
+    "sinon": "^1.14.1",
+    "sinon-chai": "^2.7.0"
   },
   "dependencies": {
     "pluralize": "^1.1.2",
