@@ -2,7 +2,7 @@
   "name": "le-storage-service",
   "version": "2.0.5",
   "description": "A simple ORM for real-time datastores",
-  "main": "src/index.js",
+  "main": "src/storage-service.js",
   "scripts": {
     "test": "gulp test:unit"
   },

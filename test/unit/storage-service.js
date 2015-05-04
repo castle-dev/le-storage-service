@@ -1,4 +1,4 @@
-var StorageService = require('../../src/index.js');
+var StorageService = require('../../src/storage-service.js');
 var RecordService = require('../../src/record-service.js');
 var CollectionService = require('../../src/collection-service.js');
 var expect = require('chai').expect;
