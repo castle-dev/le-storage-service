@@ -14,6 +14,12 @@ describe('StorageService', function() {
     expect(record).to.be.an.instanceof(RecordService);
     expect(record.getType()).to.equal('Cat');
   });
+  it('should create records with ids', function() {
+    var storage = new StorageService(mockStorageProvider);
+    var record = storage.createRecord('Cat', '1');
+    expect(record).to.be.an.instanceof(RecordService);
+    expect(record.getType()).to.equal('Cat');
+  });
   it('should create collections', function() {
     var storage = new StorageService(mockStorageProvider);
     var collection = storage.createCollection('Cat');
