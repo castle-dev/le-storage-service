@@ -4,7 +4,7 @@
   "description": "A simple ORM for real-time datastores",
   "main": "src/storage-service.js",
   "scripts": {
-    "test": "gulp test:unit"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,7 @@
     "gulp-jsdoc": "^0.1.4",
     "gulp-mocha": "^2.0.1",
     "gulp-util": "^3.0.4",
+    "le-storage-provider-firebase": "^1.0.2",
     "mocha": "^2.2.1",
     "run-sequence": "^1.0.2",
     "sinon": "^1.14.1",

@@ -24,6 +24,12 @@ gulp.task('test:unit', function () {
   .on('error', util.log);
 });
 
+gulp.task('test:e2e', function () {
+  return gulp.src('test/e2e/**/*.js', {read: false})
+  .pipe(mocha({reporter: 'nyan'}))
+  .on('error', util.log);
+});
+
 gulp.task('coverage', function () {
   return gulp.src(['test/unit/**/*.js'], { read: false })
   .pipe(cover.instrument({
@@ -38,11 +44,12 @@ gulp.task('coverage', function () {
 
 gulp.task('watch', function () {
   gulp.watch(['src/**/*.js'], ['test:unit', 'docs']);
-  gulp.watch(['test/**/*.js'], ['test:unit']);
+  gulp.watch(['test/unit/**/*.js'], ['test:unit']);
+  gulp.watch(['test/e2e/**/*.js'], ['test:e2e']);
 })
 
 gulp.task('tdd', function (done) {
   runSequence('test:unit', 'watch', done)
 });
 
-gulp.task('test', ['test:unit']);
+gulp.task('test', ['test:unit', 'test:e2e']);
