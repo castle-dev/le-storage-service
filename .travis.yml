@@ -17,4 +17,5 @@ script:
 - git push origin gh-pages -fq > /dev/null
 env:
   global:
-    secure: mUXdkL/tp2b9Yx78TL5/abmQ7PgiOG4BgOKDifhu0K0rY0UBgD5Jl0eTX3aFxUfRLpgA3/H07D7LBPE3ArsWu6H1ad166SfAMoLvqxaywShoW2cguf+A9BhO7wzwcHJ/Ocboz+kPeIaHKwvFCSbatQHyD2CdAkUdCS+83uiGE9U=
+    - secure: mUXdkL/tp2b9Yx78TL5/abmQ7PgiOG4BgOKDifhu0K0rY0UBgD5Jl0eTX3aFxUfRLpgA3/H07D7LBPE3ArsWu6H1ad166SfAMoLvqxaywShoW2cguf+A9BhO7wzwcHJ/Ocboz+kPeIaHKwvFCSbatQHyD2CdAkUdCS+83uiGE9U=
+    - FIREBASE_URL=https://le-firebase-test.firebaseio.com/
