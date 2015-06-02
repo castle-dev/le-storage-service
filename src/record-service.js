@@ -153,7 +153,6 @@ var RecordService = function (provider, type, id) {
    * @param {string} type the type of record this record has one of
    */
   this.relateToOne = function (type) {
-    var service = this;
     this['get' + toSnakeCase(type)] = function () {
       var id = _data[toCamelCase(type) + '_id'];
       var record = new RecordService(_provider, type, id);
@@ -162,7 +161,6 @@ var RecordService = function (provider, type, id) {
     this['set' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
       _data[toCamelCase(record.getType()) + '_id'] = id;
-      return service.save();
     }
   };
   /**
@@ -177,7 +175,6 @@ var RecordService = function (provider, type, id) {
    * @param {string} type the type of record this record has many of
    */
   this.relateToMany = function (type) {
-    var _service = this;
     var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function () {
       _collection = new CollectionService(_provider, type);
@@ -197,7 +194,6 @@ var RecordService = function (provider, type, id) {
       _data[toCamelCase(record.getType()) + '_ids'][id] = true;
       var record = new RecordService(_provider, type, id);
       _collection.addRecord(record);
-      return _service.save();
     }
   };
 };
