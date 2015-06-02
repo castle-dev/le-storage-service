@@ -100,7 +100,7 @@ var CollectionService = function (provider, type) {
   }
   /**
    * Lookup records in this collection
-   * @function unsync
+   * @function query
    * @memberof CollectionService
    * @instance
    * @param {string} sortBy the column name to sort on
