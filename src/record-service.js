@@ -56,6 +56,21 @@ var RecordService = function (provider, type, id) {
    */
   this.getID = function () { return _id; }
   /**
+   * Changes the record's data without saving to the datastore
+   *
+   * Useful for setting data on new records before adding relations
+   * @function setData
+   * @memberof RecordService
+   * @instance
+   * @param {Object} data the record's new data
+   */
+  this.setData = function (data) {
+    if (!data) { return q.reject(new Error('Data required')); }
+    var createdAt = _data.createdAt;
+    _data = data;
+    _data.createdAt = createdAt;
+  };
+  /**
    * Stores this record's data in the datastore
    *
    * Sets lastUpdatedAt on every save and
