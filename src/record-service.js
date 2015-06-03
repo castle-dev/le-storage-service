@@ -158,14 +158,15 @@ var RecordService = function (provider, type, id) {
     var _record = this;
     this['get' + toSnakeCase(type)] = function () {
       var id = _data[toCamelCase(type) + '_id'];
+      if (!id) { return; }
       var record = new RecordService(_provider, type, id);
       return record;
-    }
+    };
     this['set' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
       _data[toCamelCase(record.getType()) + '_id'] = id;
       return _record;
-    }
+    };
   };
   /**
    * Gives this record the ability to link and traverse many related objects
@@ -189,7 +190,7 @@ var RecordService = function (provider, type, id) {
         _collection.addRecord(record);
       }
       return _collection;
-    }
+    };
     this['add' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
       var ids = _data[toCamelCase(record.getType()) + '_ids'];
@@ -198,7 +199,54 @@ var RecordService = function (provider, type, id) {
       }
       _data[toCamelCase(record.getType()) + '_ids'][id] = true;
       return _record;
-    }
+    };
+  };
+  /**
+   * Associates related data
+   *
+   * Deep joins can be performed by passing
+   * multiple config objects to this function
+   * @function join
+   * @memberof RecordService
+   * @instance
+   * @param {...Object} config a map of properties to join on
+   * @param {string} config.type the record type to join by
+   * @param {boolean} config.many (optional) join with hasMany relation
+   * @returns {Promise} promise resolves with the combined data object
+   */
+  this.join = function () {
+    var _record = this;
+    var args = [].slice.call(arguments);
+    var deferred = q.defer();
+    var joinConfig = args.shift();
+    var type = joinConfig.type;
+    var many = joinConfig.many;
+    var relation;
+    _record.load()
+    .then(function (data) {
+      if (many) {
+        _record.relateToMany(type);
+        relation = eval('_record.get' + pluralize(toSnakeCase(type)) + '()');
+      } else {
+        _record.relateToOne(type);
+        relation = eval('_record.get' + toSnakeCase(type) + '()');
+      }
+      if (relation) {
+        var promise;
+        if (args.length === 0) { promise = relation.load(); }
+        else { promise = relation.join.apply(relation, args); }
+        return promise
+        .then(function (relatedData) {
+          data[pluralize(toCamelCase(type))] = relatedData;
+          return data;
+        });
+      }
+    })
+    .then(function (joinedData) {
+      if (!joinedData) { deferred.reject(); }
+      deferred.resolve(joinedData);
+    });
+    return deferred.promise;
   };
 };
 

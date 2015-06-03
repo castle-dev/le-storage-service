@@ -127,7 +127,29 @@ var CollectionService = function (provider, type) {
     }
     var type = pluralize(toCamelCase(_type));
     _provider.query(type, sortBy, equalTo, limit, resultFound);
-  }
+  },
+  /**
+   * Associates related data
+   *
+   * Deep joins can be performed by passing
+   * multiple config objects to this function
+   * @function join
+   * @memberof CollectionService
+   * @instance
+   * @param {...Object} config a map of properties to join on
+   * @param {string} config.type the record type to join by
+   * @param {boolean} config.many (optional) join with hasMany relation
+   * @returns {Promise} promise resolves with the combined data object
+   */
+  this.join = function () {
+    var _collection = this;
+    var records = _collection.getRecords();
+    var promises = [];
+    for (var i = 0; i < records.length; i += 1) {
+      promises.push(records[i].join.apply(records[i], arguments)); //TODO: loop over args
+    }
+    return q.all(promises);
+  };
 };
 
 module.exports = CollectionService;
