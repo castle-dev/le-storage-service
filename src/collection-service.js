@@ -48,6 +48,17 @@ var CollectionService = function (provider, type) {
     _records.push(record);
   }
   /**
+   * Returns this collection's array of records
+   *
+   * @function getRecords
+   * @memberof CollectionService
+   * @instance
+   * @returns {Array} records
+   */
+  this.getRecords = function () {
+    return _records;
+  }
+  /**
    * Reads the collection's data from the datastore
    * @function load
    * @memberof CollectionService

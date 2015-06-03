@@ -194,8 +194,6 @@ var RecordService = function (provider, type, id) {
         _data[toCamelCase(record.getType()) + '_ids'] = {};
       }
       _data[toCamelCase(record.getType()) + '_ids'][id] = true;
-      var record = new RecordService(_provider, type, id);
-      _collection.addRecord(record);
     }
   };
 };
