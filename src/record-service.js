@@ -120,7 +120,7 @@ var RecordService = function (provider, type, id) {
       _data = data;
       var dataWithID = JSON.parse(JSON.stringify(_data));
       dataWithID._id = _record.getID();
-      return _data = data;
+      return dataWithID;
     });
   };
   /**
@@ -213,7 +213,7 @@ var RecordService = function (provider, type, id) {
    * @function join
    * @memberof RecordService
    * @instance
-   * @param {...Object} config a map of properties to join on
+   * @param {...(Object|Array)} config a map of properties to join on
    * @param {string} config.type the record type to join by
    * @param {boolean} config.many (optional) join with hasMany relation
    * @returns {Promise} promise resolves with the combined data object
@@ -222,29 +222,42 @@ var RecordService = function (provider, type, id) {
     var _record = this;
     var args = [].slice.call(arguments);
     var deferred = q.defer();
-    var joinConfig = args.shift();
-    var type = joinConfig.type;
-    var many = joinConfig.many;
-    var relation;
+    var joinConfigs = args.shift();
+    if (!Array.isArray(joinConfigs)) {
+      var array = [];
+      array.push(joinConfigs);
+      joinConfigs = array;
+    }
     _record.load()
     .then(function (data) {
-      if (many) {
-        _record.relateToMany(type);
-        relation = eval('_record.get' + pluralize(toSnakeCase(type)) + '()');
-      } else {
-        _record.relateToOne(type);
-        relation = eval('_record.get' + toSnakeCase(type) + '()');
+      var promises = [];
+      for (var i = 0; i < joinConfigs.length; i += 1) {
+        (function (type, many) {
+          var relation;
+          if (many) {
+            _record.relateToMany(type);
+            relation = eval('_record.get' + pluralize(toSnakeCase(type)) + '()');
+          } else {
+            _record.relateToOne(type);
+            relation = eval('_record.get' + toSnakeCase(type) + '()');
+          }
+          if (relation) {
+            var promise;
+            if (args.length === 0) { promise = relation.load(); }
+            else { promise = relation.join.apply(relation, args); }
+            promise
+            .then(function (relatedData) {
+              var key = many ? pluralize(toCamelCase(type)) : toCamelCase(type);
+              data[key] = relatedData;
+            });
+            promises.push(promise);
+          }
+        })(joinConfigs[i].type, joinConfigs[i].many);
       }
-      if (relation) {
-        var promise;
-        if (args.length === 0) { promise = relation.load(); }
-        else { promise = relation.join.apply(relation, args); }
-        return promise
-        .then(function (relatedData) {
-          data[pluralize(toCamelCase(type))] = relatedData;
-          return data;
-        });
-      }
+      return q.all(promises)
+      .then(function () {
+        return data;
+      });
     })
     .then(function (joinedData) {
       if (!joinedData) { deferred.reject(); }
