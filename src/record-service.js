@@ -113,10 +113,14 @@ var RecordService = function (provider, type, id) {
    * @returns {Promise} resolves with the record's data
    */
   this.load = function () {
+    var _record = this;
     if (!_id) { return q.reject(new Error('Cannot load a record without an id')); }
     return _provider.load(pluralize(toCamelCase(_type)), _id)
     .then(function (data) {
-     return _data = data;
+      _data = data;
+      var dataWithID = JSON.parse(JSON.stringify(_data));
+      dataWithID._id = _record.getID();
+      return _data = data;
     });
   };
   /**
