@@ -65,10 +65,12 @@ var RecordService = function (provider, type, id) {
    * @param {Object} data the record's new data
    */
   this.setData = function (data) {
+    var _record = this;
     if (!data) { return q.reject(new Error('Data required')); }
     var createdAt = _data.createdAt;
     _data = data;
     _data.createdAt = createdAt;
+    return _record;
   };
   /**
    * Stores this record's data in the datastore
