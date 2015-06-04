@@ -48,15 +48,21 @@ describe('CollectionService', function () {
     return collection.load()
     .then(function (loadedData) {
       expect(spy).to.have.been.called;
-      expect(loadedData).to.deep.equal(collectionData);
+      for (var i = 0; i < loadedData.length; i += 1) {
+        expect(loadedData[i].name).to.deep.equal(collectionData[i].name);
+        expect(loadedData[i].color).to.deep.equal(collectionData[i].color);
+      }
     });
   });
   it('should sync records', function() {
     var spy = sinon.spy(collection, 'sync');
     return collection.sync()
     .then(function (syncedData) {
-      expect(syncedData).to.deep.equal(collectionData);
       expect(spy).to.have.been.called;
+      for (var i = 0; i < syncedData.length; i += 1) {
+        expect(syncedData[i].name).to.deep.equal(collectionData[i].name);
+        expect(syncedData[i].color).to.deep.equal(collectionData[i].color);
+      }
     });
   });
   it('should unsync records', function() {

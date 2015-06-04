@@ -95,7 +95,8 @@ describe('RecordService', function() {
     return record.load()
     .then(function (loadedData) {
       expect(spy).to.have.been.called;
-      expect(loadedData).to.equal(data);
+      expect(loadedData.name).to.equal(data.name);
+      expect(loadedData.color).to.equal(data.color);
     });
   });
   it('should not sync a record without an id', function() {
