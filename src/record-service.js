@@ -56,6 +56,23 @@ var RecordService = function (provider, type, id) {
    */
   this.getID = function () { return _id; }
   /**
+   * Changes the record's data without saving to the datastore
+   *
+   * Useful for setting data on new records before adding relations
+   * @function setData
+   * @memberof RecordService
+   * @instance
+   * @param {Object} data the record's new data
+   */
+  this.setData = function (data) {
+    var _record = this;
+    if (!data) { return q.reject(new Error('Data required')); }
+    var createdAt = _data.createdAt;
+    _data = data;
+    _data.createdAt = createdAt;
+    return _record;
+  };
+  /**
    * Stores this record's data in the datastore
    *
    * Sets lastUpdatedAt on every save and
@@ -66,11 +83,13 @@ var RecordService = function (provider, type, id) {
    * @returns {Promise}
    */
   this.save = function () {
+    var record = this;
     if (!_data.createdAt) { _data.createdAt = new Date(); }
     _data.lastUpdatedAt = new Date();
     return _provider.save(pluralize(toCamelCase(_type)), _id, cloneProperties(_data))
     .then(function (id) {
       _id = id;
+      return record;
     });
   };
   /**
@@ -96,10 +115,14 @@ var RecordService = function (provider, type, id) {
    * @returns {Promise} resolves with the record's data
    */
   this.load = function () {
+    var _record = this;
     if (!_id) { return q.reject(new Error('Cannot load a record without an id')); }
     return _provider.load(pluralize(toCamelCase(_type)), _id)
     .then(function (data) {
-     return _data = data;
+      _data = data;
+      var dataWithID = JSON.parse(JSON.stringify(_data));
+      dataWithID._id = _record.getID();
+      return dataWithID;
     });
   };
   /**
@@ -138,17 +161,18 @@ var RecordService = function (provider, type, id) {
    * @param {string} type the type of record this record has one of
    */
   this.relateToOne = function (type) {
-    var service = this;
+    var _record = this;
     this['get' + toSnakeCase(type)] = function () {
       var id = _data[toCamelCase(type) + '_id'];
+      if (!id) { return; }
       var record = new RecordService(_provider, type, id);
       return record;
-    }
+    };
     this['set' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
       _data[toCamelCase(record.getType()) + '_id'] = id;
-      return service.save();
-    }
+      return _record;
+    };
   };
   /**
    * Gives this record the ability to link and traverse many related objects
@@ -162,7 +186,7 @@ var RecordService = function (provider, type, id) {
    * @param {string} type the type of record this record has many of
    */
   this.relateToMany = function (type) {
-    var _service = this;
+    var _record = this;
     var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function () {
       _collection = new CollectionService(_provider, type);
@@ -172,7 +196,7 @@ var RecordService = function (provider, type, id) {
         _collection.addRecord(record);
       }
       return _collection;
-    }
+    };
     this['add' + toSnakeCase(type)] = function (record) {
       var id = record.getID();
       var ids = _data[toCamelCase(record.getType()) + '_ids'];
@@ -180,10 +204,68 @@ var RecordService = function (provider, type, id) {
         _data[toCamelCase(record.getType()) + '_ids'] = {};
       }
       _data[toCamelCase(record.getType()) + '_ids'][id] = true;
-      var record = new RecordService(_provider, type, id);
-      _collection.addRecord(record);
-      return _service.save();
+      return _record;
+    };
+  };
+  /**
+   * Associates related data
+   *
+   * Deep joins can be performed by passing
+   * multiple config objects to this function
+   * @function join
+   * @memberof RecordService
+   * @instance
+   * @param {...(Object|Array)} config a map of properties to join on
+   * @param {string} config.type the record type to join by
+   * @param {boolean} config.many (optional) join with hasMany relation
+   * @returns {Promise} promise resolves with the combined data object
+   */
+  this.join = function () {
+    var _record = this;
+    var args = [].slice.call(arguments);
+    var deferred = q.defer();
+    var joinConfigs = args.shift();
+    if (!Array.isArray(joinConfigs)) {
+      var array = [];
+      array.push(joinConfigs);
+      joinConfigs = array;
     }
+    _record.load()
+    .then(function (data) {
+      var promises = [];
+      for (var i = 0; i < joinConfigs.length; i += 1) {
+        (function (type, many) {
+          var relation;
+          if (many) {
+            _record.relateToMany(type);
+            relation = eval('_record.get' + pluralize(toSnakeCase(type)) + '()');
+          } else {
+            _record.relateToOne(type);
+            relation = eval('_record.get' + toSnakeCase(type) + '()');
+          }
+          if (relation) {
+            var promise;
+            if (args.length === 0) { promise = relation.load(); }
+            else { promise = relation.join.apply(relation, args); }
+            promise
+            .then(function (relatedData) {
+              var key = many ? pluralize(toCamelCase(type)) : toCamelCase(type);
+              data[key] = relatedData;
+            });
+            promises.push(promise);
+          }
+        })(joinConfigs[i].type, joinConfigs[i].many);
+      }
+      return q.all(promises)
+      .then(function () {
+        return data;
+      });
+    })
+    .then(function (joinedData) {
+      if (!joinedData) { deferred.reject(); }
+      deferred.resolve(joinedData);
+    });
+    return deferred.promise;
   };
 };
 
