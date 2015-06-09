@@ -85,6 +85,7 @@ var RecordService = function (provider, type, id) {
   this.save = function () {
     var record = this;
     if (!_data.createdAt) { _data.createdAt = new Date(); }
+    if (_data._id) { delete _data._id }
     _data.lastUpdatedAt = new Date();
     return _provider.save(pluralize(toCamelCase(_type)), _id, cloneProperties(_data))
     .then(function (id) {
