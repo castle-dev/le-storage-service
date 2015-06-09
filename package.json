@@ -1,6 +1,6 @@
 {
   "name": "le-storage-service",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "A simple ORM for real-time datastores",
   "main": "src/storage-service.js",
   "scripts": {
@@ -40,7 +40,7 @@
     "gulp-rename": "^1.2.2",
     "gulp-tag-version": "^1.2.1",
     "gulp-util": "^3.0.4",
-    "le-storage-provider-firebase": "*",
+    "le-storage-provider-firebase": "^2.0.3",
     "mocha": "^2.2.1",
     "run-sequence": "^1.0.2",
     "sinon": "^1.14.1",
