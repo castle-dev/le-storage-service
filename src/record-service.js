@@ -190,10 +190,12 @@ var RecordService = function (provider, type, id) {
     var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function () {
       _collection = new CollectionService(_provider, type);
-      var ids = Object.keys(_data[toCamelCase(type) + '_ids']);
-      for (var i = 0; i < ids.length; i++) {
-        var record = new RecordService(_provider, type, ids[i]);
-        _collection.addRecord(record);
+      if(_data[toCamelCase(type) + '_ids']) {
+        var ids = Object.keys(_data[toCamelCase(type) + '_ids']);
+        for (var i = 0; i < ids.length; i++) {
+          var record = new RecordService(_provider, type, ids[i]);
+          _collection.addRecord(record);
+        }
       }
       return _collection;
     };
