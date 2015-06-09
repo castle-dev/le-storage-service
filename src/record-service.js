@@ -121,9 +121,8 @@ var RecordService = function (provider, type, id) {
     return _provider.load(pluralize(toCamelCase(_type)), _id)
     .then(function (data) {
       _data = data;
-      var dataWithID = JSON.parse(JSON.stringify(_data));
-      dataWithID._id = _record.getID();
-      return dataWithID;
+      _data._id = _record.getID();
+      return _data;
     });
   };
   /**
