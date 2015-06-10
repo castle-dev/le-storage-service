@@ -113,9 +113,8 @@ var RecordService = function(provider, type, id) {
    */
   this.save = function() {
     var record = this;
-    if (!_data.createdAt) {
-      _data.createdAt = new Date();
-    }
+    if (!_data.createdAt) { _data.createdAt = new Date(); }
+    if (_data._id) { delete _data._id }
     _data.lastUpdatedAt = new Date();
     return _provider.save(pluralize(toCamelCase(_type)), _id, cloneProperties(_data))
       .then(function(id) {
@@ -153,12 +152,11 @@ var RecordService = function(provider, type, id) {
       return q.reject(new Error('Cannot load a record without an id'));
     }
     return _provider.load(pluralize(toCamelCase(_type)), _id)
-      .then(function(data) {
-        _data = data;
-        var dataWithID = JSON.parse(JSON.stringify(_data));
-        dataWithID._id = _record.getID();
-        return dataWithID;
-      });
+    .then(function (data) {
+      _data = data;
+      _data._id = _record.getID();
+      return _data;
+    });
   };
   /**
    * Syncs the record's data from the datastore
@@ -229,10 +227,12 @@ var RecordService = function(provider, type, id) {
     var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function() {
       _collection = new CollectionService(_provider, type);
-      var ids = Object.keys(_data[toCamelCase(type) + '_ids']);
-      for (var i = 0; i < ids.length; i++) {
-        var record = new RecordService(_provider, type, ids[i]);
-        _collection.addRecord(record);
+      if(_data[toCamelCase(type) + '_ids']) {
+        var ids = Object.keys(_data[toCamelCase(type) + '_ids']);
+        for (var i = 0; i < ids.length; i++) {
+          var record = new RecordService(_provider, type, ids[i]);
+          _collection.addRecord(record);
+        }
       }
       return _collection;
     };
