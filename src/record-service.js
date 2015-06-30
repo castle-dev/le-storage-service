@@ -2,34 +2,6 @@ var pluralize = require('pluralize');
 var q = require('q');
 var CollectionService = require('./collection-service.js');
 
-function isDate(object) {
-  return Object.prototype.toString.call(object) === '[object Date]'
-}
-
-function toSnakeCase(string) {
-  var words = string.split(' ');
-  var output = '';
-  for (var i = 0; i < words.length; i++) {
-    output = output + words[i].charAt(0).toUpperCase() + words[i].slice(1);
-  }
-  return output;
-}
-
-function toCamelCase(string) {
-  var snakeCase = toSnakeCase(string);
-  return snakeCase.charAt(0).toLowerCase() + snakeCase.slice(1);
-}
-
-function cloneProperties(obj) {
-  if (obj == null || typeof(obj) != 'object' || isDate(obj)) {
-    return obj;
-  }
-  var temp = new obj.constructor();
-  for (var key in obj) {
-    temp[key] = cloneProperties(obj[key]);
-  }
-  return temp;
-}
 /**
  * A tool for interacting with data records
  * @class RecordService
@@ -39,41 +11,15 @@ function cloneProperties(obj) {
  * @returns {Record}
  */
 var RecordService = function(provider, type, id) {
-  if (!provider) {
-    throw new Error('Provider required');
-  }
-  if (!type) {
-    throw new Error('Type required');
-  }
-  var _provider = provider;
-  var _type = toSnakeCase(type);
-  var _id = id;
-  var _data = {};
-  /**
-   * Returns this record's type
-   * @function getType
-   * @memberof RecordService
-   * @instance
-   * @returns {string}
-   */
-  this.getType = getType;
-
-  function getType() {
-    return _type;
-  }
 
   /**
-   * Returns this record's type
-   * @function getID
+   * Deletes the record
+   * @function delete
    * @memberof RecordService
    * @instance
-   * @returns {string}
+   * @returns {Promise} resolves with no data
    */
-  this.getID = getID;
-
-  function getID() {
-    return _id;
-  }
+  this.delete = deleteRecord;
 
   /**
    * Returns this record's data
@@ -84,31 +30,73 @@ var RecordService = function(provider, type, id) {
    */
   this.getData = getData;
 
-  function getData() {
-    return _data;
-  }
-
   /**
-   * Changes the record's data without saving to the datastore
-   *
-   * Useful for setting data on new records before adding relations
-   * @function setData
+   * Returns this record's type
+   * @function getID
    * @memberof RecordService
    * @instance
-   * @param {Object} data the record's new data
+   * @returns {string}
    */
-  this.setData = setData;
+  this.getID = getID;
 
-  function setData(data) {
-    var _record = this;
-    if (!data) {
-      return q.reject(new Error('Data required'));
-    }
-    var createdAt = _data.createdAt;
-    _data = data;
-    _data.createdAt = createdAt;
-    return _record;
-  };
+  /**
+   * Returns this record's type
+   * @function getType
+   * @memberof RecordService
+   * @instance
+   * @returns {string}
+   */
+  this.getType = getType;
+
+  /**
+   * Associates related data
+   *
+   * Deep joins can be performed by passing
+   * multiple config objects to this function
+   * @function join
+   * @memberof RecordService
+   * @instance
+   * @param {...(Object|Array)} config a map of properties to join on
+   * @param {string} config.type the record type to join by
+   * @param {boolean} config.many (optional) join with hasMany relation
+   * @returns {Promise} promise resolves with the combined data object
+   */
+  this.join = join;
+
+  /**
+   * Reads the record's data from the datastore
+   * @function load
+   * @memberof RecordService
+   * @instance
+   * @returns {Promise} resolves with the record's data
+   */
+  this.load = load;
+
+  /**
+   * Gives this record the ability to link and traverse many related objects
+   *
+   * After calling this, the record will have addType(record) and
+   * getTypes() methods. Example: Calling person.relateToMany('Device') will
+   * expose addDevice(device) and getDevices() methods on the person record
+   * @function relateToMany
+   * @memberof RecordService
+   * @instance
+   * @param {string} type the type of record this record has many of
+   */
+  this.relateToMany = relateToMany;
+
+  /**
+   * Gives this record the ability to link and traverse one related object
+   *
+   * After calling this, the record will have setType(record) and
+   * getType() methods. Example: Calling person.relateToOne('Car') will
+   * expose setCar(car) and getCar() methods on the person record
+   * @function relateToOne
+   * @memberof RecordService
+   * @instance
+   * @param {string} type the type of record this record has one of
+   */
+  this.relateToOne = relateToOne;
 
   /**
    * Stores this record's data in the datastore
@@ -121,6 +109,79 @@ var RecordService = function(provider, type, id) {
    * @returns {Promise}
    */
   this.save = save;
+
+  /**
+   * Changes the record's data without saving to the datastore
+   *
+   * Useful for setting data on new records before adding relations
+   * @function setData
+   * @memberof RecordService
+   * @instance
+   * @param {Object} data the record's new data
+   */
+  this.setData = setData;
+
+  /**
+   * Syncs the record's data from the datastore
+   * @function sync
+   * @memberof RecordService
+   * @instance
+   * @param {Function} onDataChanged the callback that receives updates to the record's data
+   * @returns {Promise} resolves with the record's data
+   */
+  this.sync = sync;
+
+  /**
+   * Removes the record's sync listener
+   * @function unsync
+   * @memberof RecordService
+   * @instance
+   */
+  this.unsync = unsync;
+
+  /**
+   * Overwrite the record's data and save in the datastore
+   * @function update
+   * @memberof RecordService
+   * @instance
+   * @param {Object} data the record's new data
+   * @returns {Promise}
+   */
+  this.update = update;
+
+  if (!provider) {
+    throw new Error('Provider required');
+  }
+  if (!type) {
+    throw new Error('Type required');
+  }
+  var _provider = provider;
+  var _type = toSnakeCase(type);
+  var _id = id;
+  var _data = {};
+
+  function getType() {
+    return _type;
+  }
+
+  function getID() {
+    return _id;
+  }
+
+  function getData() {
+    return _data;
+  }
+
+  function setData(data) {
+    var _record = this;
+    if (!data) {
+      return q.reject(new Error('Data required'));
+    }
+    var createdAt = _data.createdAt;
+    _data = data;
+    _data.createdAt = createdAt;
+    return _record;
+  };
 
   function save() {
     var record = this;
@@ -138,16 +199,6 @@ var RecordService = function(provider, type, id) {
       });
   };
 
-  /**
-   * Overwrite the record's data and save in the datastore
-   * @function update
-   * @memberof RecordService
-   * @instance
-   * @param {Object} data the record's new data
-   * @returns {Promise}
-   */
-  this.update = update;
-
   function update(data) {
     if (!data) {
       return q.reject(new Error('Data required'));
@@ -157,15 +208,6 @@ var RecordService = function(provider, type, id) {
     _data.createdAt = createdAt;
     return this.save();
   };
-
-  /**
-   * Reads the record's data from the datastore
-   * @function load
-   * @memberof RecordService
-   * @instance
-   * @returns {Promise} resolves with the record's data
-   */
-  this.load = load;
 
   function load() {
     var deferred = q.defer();
@@ -191,14 +233,8 @@ var RecordService = function(provider, type, id) {
       });
     return deferred.promise;
   };
-  /**
-   * Deletes the record
-   * @function delete
-   * @memberof RecordService
-   * @instance
-   * @returns {Promise} resolves with no data
-   */
-  this.delete = function() {
+
+  function deleteRecord() {
     var deferred = q.defer();
     this.load().then(function(data) {
       _data.deletedAt = new Date();
@@ -213,15 +249,8 @@ var RecordService = function(provider, type, id) {
     });
     return deferred.promise;
   }
-  /**
-   * Syncs the record's data from the datastore
-   * @function sync
-   * @memberof RecordService
-   * @instance
-   * @param {Function} onDataChanged the callback that receives updates to the record's data
-   * @returns {Promise} resolves with the record's data
-   */
-  this.sync = function(onDataChanged) {
+
+  function sync(onDataChanged) {
     if (!_id) {
       return q.reject(new Error('Cannot sync a record without an id'));
     }
@@ -230,27 +259,12 @@ var RecordService = function(provider, type, id) {
       onDataChanged(data);
     });
   };
-  /**
-   * Removes the record's sync listener
-   * @function unsync
-   * @memberof RecordService
-   * @instance
-   */
-  this.unsync = function() {
+
+  function unsync() {
     _provider.unsync(pluralize(toCamelCase(_type)), _id);
   }
-  /**
-   * Gives this record the ability to link and traverse one related object
-   *
-   * After calling this, the record will have setType(record) and
-   * getType() methods. Example: Calling person.relateToOne('Car') will
-   * expose setCar(car) and getCar() methods on the person record
-   * @function relateToOne
-   * @memberof RecordService
-   * @instance
-   * @param {string} type the type of record this record has one of
-   */
-  this.relateToOne = function(type) {
+
+  function relateToOne(type) {
     var _record = this;
     this['get' + toSnakeCase(type)] = function() {
       var id = _data[toCamelCase(type) + '_id'];
@@ -266,18 +280,8 @@ var RecordService = function(provider, type, id) {
       return _record;
     };
   };
-  /**
-   * Gives this record the ability to link and traverse many related objects
-   *
-   * After calling this, the record will have addType(record) and
-   * getTypes() methods. Example: Calling person.relateToMany('Device') will
-   * expose addDevice(device) and getDevices() methods on the person record
-   * @function relateToMany
-   * @memberof RecordService
-   * @instance
-   * @param {string} type the type of record this record has many of
-   */
-  this.relateToMany = function(type) {
+
+  function relateToMany(type) {
     var _record = this;
     var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function() {
@@ -301,20 +305,8 @@ var RecordService = function(provider, type, id) {
       return _record;
     };
   };
-  /**
-   * Associates related data
-   *
-   * Deep joins can be performed by passing
-   * multiple config objects to this function
-   * @function join
-   * @memberof RecordService
-   * @instance
-   * @param {...(Object|Array)} config a map of properties to join on
-   * @param {string} config.type the record type to join by
-   * @param {boolean} config.many (optional) join with hasMany relation
-   * @returns {Promise} promise resolves with the combined data object
-   */
-  this.join = function() {
+
+  function join() {
     var _record = this;
     var args = [].slice.call(arguments);
     var deferred = q.defer();
@@ -367,5 +359,34 @@ var RecordService = function(provider, type, id) {
     return deferred.promise;
   };
 };
+
+function isDate(object) {
+  return Object.prototype.toString.call(object) === '[object Date]'
+}
+
+function toSnakeCase(string) {
+  var words = string.split(' ');
+  var output = '';
+  for (var i = 0; i < words.length; i++) {
+    output = output + words[i].charAt(0).toUpperCase() + words[i].slice(1);
+  }
+  return output;
+}
+
+function toCamelCase(string) {
+  var snakeCase = toSnakeCase(string);
+  return snakeCase.charAt(0).toLowerCase() + snakeCase.slice(1);
+}
+
+function cloneProperties(obj) {
+  if (obj == null || typeof(obj) != 'object' || isDate(obj)) {
+    return obj;
+  }
+  var temp = new obj.constructor();
+  for (var key in obj) {
+    temp[key] = cloneProperties(obj[key]);
+  }
+  return temp;
+}
 
 module.exports = RecordService;
