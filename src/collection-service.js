@@ -1,6 +1,7 @@
 var pluralize = require('pluralize');
 var q = require('q');
-function toSnakeCase (string) {
+
+function toSnakeCase(string) {
   var words = string.split(' ');
   var output = '';
   for (var i = 0; i < words.length; i++) {
@@ -8,7 +9,8 @@ function toSnakeCase (string) {
   }
   return output;
 }
-function toCamelCase (string) {
+
+function toCamelCase(string) {
   var snakeCase = toSnakeCase(string);
   return snakeCase.charAt(0).toLowerCase() + snakeCase.slice(1);
 }
@@ -19,9 +21,13 @@ function toCamelCase (string) {
  * @param {string} type the type of collection to create
  * @returns {Collection} collection
  */
-var CollectionService = function (provider, type) {
-  if (!provider) { throw new Error('Provider required'); }
-  if (!type) { throw new Error('Type required'); }
+var CollectionService = function(provider, type) {
+  if (!provider) {
+    throw new Error('Provider required');
+  }
+  if (!type) {
+    throw new Error('Type required');
+  }
   var RecordService = require('./record-service.js'); //required at runtime to avoid circular dependency
   var _provider = provider;
   var _type = toSnakeCase(type);
@@ -35,14 +41,18 @@ var CollectionService = function (provider, type) {
    * @memberof CollectionService
    * @instance
    */
-  this.addRecord = function (record) {
+  this.addRecord = function(record) {
     var collection = this;
-    if (!(record instanceof RecordService)) { throw new Error('Only records created by the RecordService can be added'); }
-    if (record.getType() !== _type) { throw new Error('Type mismatch'); }
+    if (!(record instanceof RecordService)) {
+      throw new Error('Only records created by the RecordService can be added');
+    }
+    if (record.getType() !== _type) {
+      throw new Error('Type mismatch');
+    }
     if (_sync) {
-      record.sync(function () {
+      record.sync(function() {
         collection.load()
-        .then(_sync);
+          .then(_sync);
       });
     }
     _records.push(record);
@@ -55,7 +65,7 @@ var CollectionService = function (provider, type) {
    * @instance
    * @returns {Array} records
    */
-  this.getRecords = function () {
+  this.getRecords = function() {
     return _records;
   }
   /**
@@ -65,18 +75,20 @@ var CollectionService = function (provider, type) {
    * @instance
    * @returns {Promise} promise resolves with an array of the collection's data
    */
-  this.load = function () {
+  this.load = function() {
     var promises = [];
     var collectionData = [];
     for (var i = 0; i < _records.length; i++) {
-      promises.push(_records[i].load().then(function (recordData) {
+      promises.push(_records[i].load().then(function(recordData) {
         collectionData.push(recordData);
       }));
     }
-    return q.all(promises)
-    .then(function () {
-      return collectionData;
-    });
+    return q.allSettled(promises)
+      .then(function() {
+        return collectionData;
+      }, function(err) {
+        return collectionData;
+      });
   }
   /**
    * Syncs the collection's data from the datastore
@@ -86,13 +98,13 @@ var CollectionService = function (provider, type) {
    * @param {Function} onDataChanged the callback that receives updates to the collection's data
    * @returns {Promise} promise resolves with the collection's data
    */
-  this.sync = function (onDataChanged) {
+  this.sync = function(onDataChanged) {
     _sync = onDataChanged;
     var collection = this;
     for (var i = 0; i < _records.length; i++) {
-      _records[i].sync(function () {
+      _records[i].sync(function() {
         collection.load()
-        .then(onDataChanged);
+          .then(onDataChanged);
       });
     }
     return collection.load();
@@ -103,7 +115,7 @@ var CollectionService = function (provider, type) {
    * @memberof CollectionService
    * @instance
    */
-  this.unsync = function () {
+  this.unsync = function() {
     for (var i = 0; i < _records.length; i++) {
       _records[i].unsync();
     }
@@ -118,10 +130,11 @@ var CollectionService = function (provider, type) {
    * @param {(string|number)} equalTo the value to filter by
    * @param {number} limit the maximum number of records to find
    */
-  this.query = function (sortBy, equalTo, limit) {
+  this.query = function(sortBy, equalTo, limit) {
     var service = this;
     service._records = [];
-    function resultFound (key) {
+
+    function resultFound(key) {
       var record = new RecordService(_provider, _type, key);
       service.addRecord(record);
     }
@@ -141,7 +154,7 @@ var CollectionService = function (provider, type) {
    * @param {boolean} config.many (optional) join with hasMany relation
    * @returns {Promise} promise resolves with the combined data object
    */
-  this.join = function () {
+  this.join = function() {
     var _collection = this;
     var records = _collection.getRecords();
     var promises = [];

@@ -345,10 +345,12 @@ var RecordService = function(provider, type, id) {
             }
           })(joinConfigs[i].type, joinConfigs[i].many);
         }
-        return q.all(promises)
+        return q.allSettled(promises)
           .then(function() {
             return data;
           });
+      }, function(err) {
+        deferred.reject(err);
       })
       .then(function(joinedData) {
         if (!joinedData) {
