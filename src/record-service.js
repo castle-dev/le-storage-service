@@ -22,7 +22,7 @@ var RecordService = function(provider, type, id) {
   this.delete = deleteRecord;
 
   /**
-   * Returns this record's data
+   * Returns this record's locally stored data
    * @function getData
    * @memberOf RecordService
    * @instance
