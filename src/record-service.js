@@ -56,7 +56,9 @@ var RecordService = function(provider, type, id) {
    * @instance
    * @returns {string}
    */
-  this.getType = function() {
+  this.getType = getType;
+
+  function getType() {
     return _type;
   }
 
@@ -67,7 +69,9 @@ var RecordService = function(provider, type, id) {
    * @instance
    * @returns {string}
    */
-  this.getID = function() {
+  this.getID = getID;
+
+  function getID() {
     return _id;
   }
 
@@ -78,7 +82,9 @@ var RecordService = function(provider, type, id) {
    * @instance
    * @return {object}
    */
-  this.getData = function() {
+  this.getData = getData;
+
+  function getData() {
     return _data;
   }
 
@@ -91,7 +97,9 @@ var RecordService = function(provider, type, id) {
    * @instance
    * @param {Object} data the record's new data
    */
-  this.setData = function(data) {
+  this.setData = setData;
+
+  function setData(data) {
     var _record = this;
     if (!data) {
       return q.reject(new Error('Data required'));
@@ -101,6 +109,7 @@ var RecordService = function(provider, type, id) {
     _data.createdAt = createdAt;
     return _record;
   };
+
   /**
    * Stores this record's data in the datastore
    *
@@ -111,10 +120,16 @@ var RecordService = function(provider, type, id) {
    * @instance
    * @returns {Promise}
    */
-  this.save = function() {
+  this.save = save;
+
+  function save() {
     var record = this;
-    if (!_data.createdAt) { _data.createdAt = new Date(); }
-    if (_data._id) { delete _data._id }
+    if (!_data.createdAt) {
+      _data.createdAt = new Date();
+    }
+    if (_data._id) {
+      delete _data._id
+    }
     _data.lastUpdatedAt = new Date();
     return _provider.save(pluralize(toCamelCase(_type)), _id, cloneProperties(_data))
       .then(function(id) {
@@ -122,6 +137,7 @@ var RecordService = function(provider, type, id) {
         return record;
       });
   };
+
   /**
    * Overwrite the record's data and save in the datastore
    * @function update
@@ -130,7 +146,9 @@ var RecordService = function(provider, type, id) {
    * @param {Object} data the record's new data
    * @returns {Promise}
    */
-  this.update = function(data) {
+  this.update = update;
+
+  function update(data) {
     if (!data) {
       return q.reject(new Error('Data required'));
     }
@@ -139,6 +157,7 @@ var RecordService = function(provider, type, id) {
     _data.createdAt = createdAt;
     return this.save();
   };
+
   /**
    * Reads the record's data from the datastore
    * @function load
@@ -146,18 +165,54 @@ var RecordService = function(provider, type, id) {
    * @instance
    * @returns {Promise} resolves with the record's data
    */
-  this.load = function() {
+  this.load = load;
+
+  function load() {
+    var deferred = q.defer();
     var _record = this;
     if (!_id) {
-      return q.reject(new Error('Cannot load a record without an id'));
+      deferred.reject(new Error('Cannot load a record without an id'));
     }
-    return _provider.load(pluralize(toCamelCase(_type)), _id)
-    .then(function (data) {
-      _data = data;
-      _data._id = _record.getID();
-      return _data;
-    });
+    _provider.load(pluralize(toCamelCase(_type)), _id)
+      .then(function(data) {
+        if (!data) {
+          deferred.reject(new Error('Specified record does not exist remotely'));
+          return;
+        }
+        if (data.deletedAt) {
+          deferred.reject(new Error('The record has been deleted'));
+          return;
+        }
+        _data = data;
+        _data._id = _record.getID();
+        deferred.resolve(_data);
+      }, function(err) {
+        deferred.reject(err);
+      });
+    return deferred.promise;
   };
+  /**
+   * Deletes the record
+   * @function delete
+   * @memberof RecordService
+   * @instance
+   * @returns {Promise} resolves with no data
+   */
+  this.delete = function() {
+    var deferred = q.defer();
+    this.load().then(function(data) {
+      _data.deletedAt = new Date();
+      save().then(function() {
+        deferred.resolve();
+      }, function(err) {
+        deferred.reject(err);
+      });
+
+    }, function(err) {
+      this.reject(err);
+    });
+    return deferred.promise;
+  }
   /**
    * Syncs the record's data from the datastore
    * @function sync
@@ -227,7 +282,7 @@ var RecordService = function(provider, type, id) {
     var _collection = new CollectionService(_provider, type);
     this['get' + pluralize(toSnakeCase(type))] = function() {
       _collection = new CollectionService(_provider, type);
-      if(_data[toCamelCase(type) + '_ids']) {
+      if (_data[toCamelCase(type) + '_ids']) {
         var ids = Object.keys(_data[toCamelCase(type) + '_ids']);
         for (var i = 0; i < ids.length; i++) {
           var record = new RecordService(_provider, type, ids[i]);
