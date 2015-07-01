@@ -56,6 +56,29 @@ var StorageService = function(provider) {
     });
     return deferred.promise;
   }
+
+  /**
+   * deletes a remotely stored record
+   * @function deleteRecord
+   * @memberof StorageService
+   * @instance
+   * @param {string} type the type of record to delete
+   * @param {string} id the id of the record
+   * @returns promise resolves with no data
+   */
+  this.deleteRecord = function(type, id) {
+    var deferred = q.defer();
+    this.fetchRecord(type, id).then(function(returnedRecord) {
+      returnedRecord.delete().then(function() {
+        deferred.resolve();
+      }, function(err) {
+        deferred.reject(err);
+      });
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  }
 };
 
 module.exports = StorageService;
