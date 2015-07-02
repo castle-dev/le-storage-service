@@ -311,7 +311,7 @@ var RecordService = function(provider, type, id) {
     var args = [].slice.call(arguments);
     var deferred = q.defer();
     var joinConfigs = args.shift();
-    if (!Array.isArray(joinConfigs)) {
+    if (!Array.isArray(joinConfigs) && joinConfigs) {
       var array = [];
       array.push(joinConfigs);
       joinConfigs = array;
@@ -319,31 +319,33 @@ var RecordService = function(provider, type, id) {
     _record.load()
       .then(function(data) {
         var promises = [];
-        for (var i = 0; i < joinConfigs.length; i += 1) {
-          (function(type, many) {
-            var relation;
-            if (many) {
-              _record.relateToMany(type);
-              relation = eval('_record.get' + pluralize(toSnakeCase(type)) + '()');
-            } else {
-              _record.relateToOne(type);
-              relation = eval('_record.get' + toSnakeCase(type) + '()');
-            }
-            if (relation) {
-              var promise;
-              if (args.length === 0) {
-                promise = relation.load();
+        if (joinConfigs) {
+          for (var i = 0; i < joinConfigs.length; i += 1) {
+            (function(type, many) {
+              var relation;
+              if (many) {
+                _record.relateToMany(type);
+                relation = eval('_record.get' + pluralize(toSnakeCase(type)) + '()');
               } else {
-                promise = relation.join.apply(relation, args);
+                _record.relateToOne(type);
+                relation = eval('_record.get' + toSnakeCase(type) + '()');
               }
-              promise
-                .then(function(relatedData) {
-                  var key = many ? pluralize(toCamelCase(type)) : toCamelCase(type);
-                  data[key] = relatedData;
-                });
-              promises.push(promise);
-            }
-          })(joinConfigs[i].type, joinConfigs[i].many);
+              if (relation) {
+                var promise;
+                if (args.length === 0) {
+                  promise = relation.load();
+                } else {
+                  promise = relation.join.apply(relation, args);
+                }
+                promise
+                  .then(function(relatedData) {
+                    var key = many ? pluralize(toCamelCase(type)) : toCamelCase(type);
+                    data[key] = relatedData;
+                  });
+                promises.push(promise);
+              }
+            })(joinConfigs[i].type, joinConfigs[i].many);
+          }
         }
         return q.allSettled(promises)
           .then(function() {

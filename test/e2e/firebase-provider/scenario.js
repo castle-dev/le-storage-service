@@ -92,8 +92,8 @@ function testFetchRecord() {
   });
 }
 
-function testJoin() {
-  describe('Join', function() {
+function testRecordJoin() {
+  describe('Record Join', function() {
 
     var rootRecordForJoin_id = 'rootRecordForJoin_id';
     var joinedChildRecord1_id = 'joinedChildRecord1_id';
@@ -187,6 +187,55 @@ function testJoin() {
   });
 }
 
+function testCollectionJoin() {
+  describe('Collection Join', function() {
+
+    var rootRecord1ID = 'rootRecord1ID';
+    var rootDeletedRecordID = 'rootDeletedRecordID';
+
+    before(function(done) {
+      firebaseRef.set({}, function() {
+        var rootRecord1 = storage.createRecord('Root', rootRecord1ID);
+        var rootRecord1Data = {};
+        rootRecord1Data.setField = 'testing 123';
+        rootRecord1.setData(rootRecord1Data);
+
+        var rootDeletedRecord = storage.createRecord('Root', rootDeletedRecordID);
+        var rootDeletedRecordData = {};
+        rootDeletedRecordData.someField = 'deleted record data';
+        rootDeletedRecordData.deletedAt = new Date();
+        rootDeletedRecord.setData(rootDeletedRecordData);
+        rootDeletedRecord.setData(rootDeletedRecordData);
+
+        var promises = [];
+        promises.push(rootRecord1.save());
+        promises.push(rootDeletedRecord.save());
+
+        q.all(promises).then(function() {
+          done();
+        }, function(err) {
+          console.log(err);
+        });
+      });
+    });
+
+    it('should return the joined data exculding the deleted records', function(done) {
+      var testCollection = storage.createCollection('Root');
+      var validRecord = storage.createRecord('Root', rootRecord1ID);
+      var deletedRecord = storage.createRecord('Root', rootDeletedRecordID);
+      testCollection.addRecord(deletedRecord);
+      testCollection.addRecord(validRecord);
+      testCollection.join().then(function(data) {
+        expect(data.length).to.equal(1);
+        expect(data[0].setField).to.equal('testing 123');
+        done();
+      }, function(err) {
+        console.log(err);
+      });
+    });
+  });
+}
 testFetchRecord();
 testUpdateRecordWithInvalidData();
-testJoin();
+testRecordJoin();
+testCollectionJoin();

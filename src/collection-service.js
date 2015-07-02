@@ -136,7 +136,9 @@ var CollectionService = function(provider, type) {
 
     function resultFound(key) {
       var record = new RecordService(_provider, _type, key);
-      service.addRecord(record);
+      record.load().then(function() {
+        service.addRecord(record);
+      })
     }
     var type = pluralize(toCamelCase(_type));
     _provider.query(type, sortBy, equalTo, limit, resultFound);
@@ -155,13 +157,26 @@ var CollectionService = function(provider, type) {
    * @returns {Promise} promise resolves with the combined data object
    */
   this.join = function() {
+    var deferred = q.defer();
     var _collection = this;
     var records = _collection.getRecords();
     var promises = [];
     for (var i = 0; i < records.length; i += 1) {
       promises.push(records[i].join.apply(records[i], arguments)); //TODO: loop over args
     }
-    return q.all(promises);
+    q.allSettled(promises).then(function(settledPromises) {
+      var data = [];
+      for (var i = 0; i < settledPromises.length; i++) {
+        if (settledPromises[i].state === 'fulfilled') {
+          data.push(settledPromises[i].value);
+        }
+      }
+      deferred.resolve(data);
+    }, function(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
   };
 };
 
