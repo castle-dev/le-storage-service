@@ -85,13 +85,13 @@ describe('RecordService', function() {
         expect(spy).to.have.been.called;
       });
   });
-  it('should not load a record without an id', function() {
+  it('should not load a record without an id', function(done) {
     var record = new RecordService(mockStorageProvider, type);
-    return record.load()
-      .catch(function(err) {
-        expect(err).to.be.an.instanceof(Error);
-        expect(err.message).to.equal('Cannot load a record without an id');
-      });
+    return record.load().then(function() {}, function(err) {
+      expect(err).to.be.an.instanceof(Error);
+      expect(err.message).to.equal('Cannot load a record without an id');
+      done();
+    });
   });
   it('should load data', function() {
     var record = new RecordService(mockStorageProvider, type, id);
