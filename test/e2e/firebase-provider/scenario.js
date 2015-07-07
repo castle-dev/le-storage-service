@@ -360,9 +360,9 @@ function testFetchCollection() {
   });
 }
 
-// testFetchRecord();
-// testUpdateRecordWithInvalidData();
-// testRecordJoin();
-// testCollectionJoin();
-// testCollectionLoad();
+testFetchRecord();
+testUpdateRecordWithInvalidData();
+testRecordJoin();
+testCollectionJoin();
+testCollectionLoad();
 testFetchCollection();
