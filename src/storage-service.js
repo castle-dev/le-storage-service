@@ -37,6 +37,37 @@ var StorageService = function(provider) {
   };
 
   /**
+   * Retrieves all the remotely stored records matching the specified search criteria
+   * @function fetchCollection
+   * @memberOf StorageService
+   * @instance
+   * @param {string} type the type of records in collection, required
+   * @param {string} orderBy the name of the field to order the records by
+   *                         and to check the equalTo value against, required if using equalTo
+   * @param {string, number, null, or boolean} equalTo the value to compare the field
+   *                         specified in orderBy against and only add records that
+   *                         have the matching value in the specified field
+   * @param {number} limit the maximum number of records to be placed in the collection
+   * @return promise resolves with the collection
+   */
+  this.fetchCollection = function(type, orderBy, equalTo, limit) {
+    var deferred = q.defer();
+    var self = this;
+    _provider.queryOnce(type, orderBy, equalTo, limit).then(function(data) {
+      var collection = self.createCollection(type);
+      for (recordID in data) {
+        var record = self.createRecord(type, recordID);
+        record.setData(data[recordID]);
+        collection.addRecord(record);
+      }
+      deferred.resolve(collection);
+    }, function(err) {
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  }
+
+  /**
    * Retrieves a remotely stored record
    * @function fetchRecord
    * @memberof StorageService

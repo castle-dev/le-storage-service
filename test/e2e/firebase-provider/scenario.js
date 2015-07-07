@@ -285,8 +285,84 @@ function testCollectionLoad() {
   });
 }
 
-testFetchRecord();
-testUpdateRecordWithInvalidData();
-testRecordJoin();
-testCollectionJoin();
-testCollectionLoad();
+function testFetchCollection() {
+  describe('fetchCollection', function() {
+
+    var catRecord1ID = 'catRecord1ID';
+    var catRecord2ID = 'catRecord2ID';
+    var catRecord3ID = 'catRecord3ID';
+    var catRecord4ID = 'catRecord4ID';
+    var dogRecordID = 'dogRecordID';
+
+    before(function(done) {
+      firebaseRef.set({}, function() {
+        var catRecord1 = storage.createRecord('Cat', catRecord1ID);
+        catRecord1.setData({
+          "testing": "cat 1",
+          "fieldToCheck": "in collection"
+        });
+        var catRecord2 = storage.createRecord('Cat', catRecord2ID);
+        catRecord2.setData({
+          "testing": "cat 2"
+        });
+
+        var catRecord3 = storage.createRecord('Cat', catRecord3ID);
+        catRecord3.setData({
+          "testing": "cat 3",
+          "fieldToCheck": "in collection"
+        });
+
+        var catRecord4 = storage.createRecord('Cat', catRecord4ID);
+        catRecord4.setData({
+          "testing": "cat 4",
+          "fieldToCheck": "not in collection"
+        });
+
+        var dogRecord = storage.createRecord('Dog', dogRecordID);
+        dogRecord.setData({
+          "testing": "dog"
+        });
+
+
+        var promises = [];
+        promises.push(catRecord1.save());
+        promises.push(catRecord2.save());
+        promises.push(catRecord3.save());
+        promises.push(catRecord4.save());
+        promises.push(dogRecord.save());
+
+        q.all(promises).then(function() {
+          done();
+        }, function(err) {
+          console.log(err);
+        });
+      });
+    });
+
+    it('should return all the cat records', function(done) {
+      storage.fetchCollection('cats').then(function(collection) {
+        expect(collection.getRecords().length).to.equal(4);
+        done();
+      }, function(err) {
+        console.log(err);
+      });
+    });
+
+    it('should return all the cat records', function(done) {
+      storage.fetchCollection('cats', 'fieldToCheck', 'in collection').then(function(collection) {
+        expect(collection.getRecords().length).to.equal(2);
+        done();
+      }, function(err) {
+        console.log(err);
+      });
+    });
+
+  });
+}
+
+// testFetchRecord();
+// testUpdateRecordWithInvalidData();
+// testRecordJoin();
+// testCollectionJoin();
+// testCollectionLoad();
+testFetchCollection();
