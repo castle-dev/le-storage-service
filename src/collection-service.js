@@ -1,19 +1,8 @@
 var pluralize = require('pluralize');
 var q = require('q');
+var CaseConverter = require('./case-converter.js');
+var caseConverter = new CaseConverter();
 
-function toSnakeCase(string) {
-  var words = string.split(' ');
-  var output = '';
-  for (var i = 0; i < words.length; i++) {
-    output = output + words[i].charAt(0).toUpperCase() + words[i].slice(1);
-  }
-  return output;
-}
-
-function toCamelCase(string) {
-  var snakeCase = toSnakeCase(string);
-  return snakeCase.charAt(0).toLowerCase() + snakeCase.slice(1);
-}
 /**
  * A tool for interacting with collections of data
  * @class CollectionService
@@ -30,7 +19,7 @@ var CollectionService = function(provider, type) {
   }
   var RecordService = require('./record-service.js'); //required at runtime to avoid circular dependency
   var _provider = provider;
-  var _type = toSnakeCase(type);
+  var _type = caseConverter.toSnakeCase(type);
   var _records = [];
   var _sync;
   /**
@@ -140,7 +129,7 @@ var CollectionService = function(provider, type) {
         service.addRecord(record);
       })
     }
-    var type = pluralize(toCamelCase(_type));
+    var type = pluralize(caseConverter.toCamelCase(_type));
     _provider.query(type, sortBy, equalTo, limit, resultFound);
   },
   /**

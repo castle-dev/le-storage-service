@@ -340,7 +340,7 @@ function testFetchCollection() {
     });
 
     it('should return all the cat records', function(done) {
-      storage.fetchCollection('cats').then(function(collection) {
+      storage.fetchCollection('Cat').then(function(collection) {
         expect(collection.getRecords().length).to.equal(4);
         done();
       }, function(err) {
@@ -349,7 +349,7 @@ function testFetchCollection() {
     });
 
     it('should return all the cat records', function(done) {
-      storage.fetchCollection('cats', 'fieldToCheck', 'in collection').then(function(collection) {
+      storage.fetchCollection('Cat', 'fieldToCheck', 'in collection').then(function(collection) {
         expect(collection.getRecords().length).to.equal(2);
         done();
       }, function(err) {

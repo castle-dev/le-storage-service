@@ -1,6 +1,10 @@
 var RecordService = require('./record-service.js');
 var CollectionService = require('./collection-service.js');
 var q = require('q');
+var pluralize = require('pluralize');
+var CaseConverter = require('./case-converter.js');
+var caseConverter = new CaseConverter();
+
 /**
  * A simple ORM for real-time datastores
  * @class StorageService
@@ -53,7 +57,7 @@ var StorageService = function(provider) {
   this.fetchCollection = function(type, orderBy, equalTo, limit) {
     var deferred = q.defer();
     var self = this;
-    _provider.queryOnce(type, orderBy, equalTo, limit).then(function(data) {
+    _provider.queryOnce(pluralize(caseConverter.toCamelCase(type)), orderBy, equalTo, limit).then(function(data) {
       var collection = self.createCollection(type);
       for (recordID in data) {
         var record = self.createRecord(type, recordID);
