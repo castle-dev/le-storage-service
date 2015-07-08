@@ -292,6 +292,7 @@ function testFetchCollection() {
     var catRecord2ID = 'catRecord2ID';
     var catRecord3ID = 'catRecord3ID';
     var catRecord4ID = 'catRecord4ID';
+    var catRecord5ID = 'catRecord5ID';
     var dogRecordID = 'dogRecordID';
 
     before(function(done) {
@@ -318,6 +319,14 @@ function testFetchCollection() {
           "fieldToCheck": "not in collection"
         });
 
+        var catRecord5 = storage.createRecord('Cat', catRecord5ID);
+        var carRecord5Data = {
+          "testing": "cat 4",
+          "fieldToCheck": "in collection"
+        };
+        carRecord5Data.deletedAt = new Date();
+        catRecord5.setData(carRecord5Data);
+
         var dogRecord = storage.createRecord('Dog', dogRecordID);
         dogRecord.setData({
           "testing": "dog"
@@ -329,6 +338,7 @@ function testFetchCollection() {
         promises.push(catRecord2.save());
         promises.push(catRecord3.save());
         promises.push(catRecord4.save());
+        promises.push(catRecord5.save());
         promises.push(dogRecord.save());
 
         q.all(promises).then(function() {

@@ -60,9 +60,11 @@ var StorageService = function(provider) {
     _provider.queryOnce(pluralize(caseConverter.toCamelCase(type)), orderBy, equalTo, limit).then(function(data) {
       var collection = self.createCollection(type);
       for (recordID in data) {
-        var record = self.createRecord(type, recordID);
-        record.setData(data[recordID]);
-        collection.addRecord(record);
+        if (!data[recordID].deletedAt) {
+          var record = self.createRecord(type, recordID);
+          record.setData(data[recordID]);
+          collection.addRecord(record);
+        }
       }
       deferred.resolve(collection);
     }, function(err) {
