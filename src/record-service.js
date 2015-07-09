@@ -1,6 +1,8 @@
 var pluralize = require('pluralize');
 var q = require('q');
 var CollectionService = require('./collection-service.js');
+var CaseConverter = require('./case-converter.js');
+var caseConverter = new CaseConverter();
 
 /**
  * A tool for interacting with data records
@@ -156,7 +158,7 @@ var RecordService = function(provider, type, id) {
     throw new Error('Type required');
   }
   var _provider = provider;
-  var _type = toSnakeCase(type);
+  var _type = caseConverter.toSnakeCase(type);
   var _id = id;
   var _data = {};
 
@@ -192,7 +194,7 @@ var RecordService = function(provider, type, id) {
       delete _data._id
     }
     _data.lastUpdatedAt = new Date();
-    return _provider.save(pluralize(toCamelCase(_type)), _id, cloneProperties(_data))
+    return _provider.save(pluralize(caseConverter.toCamelCase(_type)), _id, cloneProperties(_data))
       .then(function(id) {
         _id = id;
         return record;
@@ -215,7 +217,7 @@ var RecordService = function(provider, type, id) {
     if (!_id) {
       deferred.reject(new Error('Cannot load a record without an id'));
     }
-    _provider.load(pluralize(toCamelCase(_type)), _id)
+    _provider.load(pluralize(caseConverter.toCamelCase(_type)), _id)
       .then(function(data) {
         if (!data) {
           deferred.reject(new Error('Specified record does not exist remotely'));
@@ -254,29 +256,29 @@ var RecordService = function(provider, type, id) {
     if (!_id) {
       return q.reject(new Error('Cannot sync a record without an id'));
     }
-    return _provider.sync(pluralize(toCamelCase(_type)), _id, function(data) {
+    return _provider.sync(pluralize(caseConverter.toCamelCase(_type)), _id, function(data) {
       _data = data;
       onDataChanged(data);
     });
   };
 
   function unsync() {
-    _provider.unsync(pluralize(toCamelCase(_type)), _id);
+    _provider.unsync(pluralize(caseConverter.toCamelCase(_type)), _id);
   }
 
   function relateToOne(type) {
     var _record = this;
-    this['get' + toSnakeCase(type)] = function() {
-      var id = _data[toCamelCase(type) + '_id'];
+    this['get' + caseConverter.toSnakeCase(type)] = function() {
+      var id = _data[caseConverter.toCamelCase(type) + '_id'];
       if (!id) {
         return;
       }
       var record = new RecordService(_provider, type, id);
       return record;
     };
-    this['set' + toSnakeCase(type)] = function(record) {
+    this['set' + caseConverter.toSnakeCase(type)] = function(record) {
       var id = record.getID();
-      _data[toCamelCase(record.getType()) + '_id'] = id;
+      _data[caseConverter.toCamelCase(record.getType()) + '_id'] = id;
       return _record;
     };
   };
@@ -284,10 +286,10 @@ var RecordService = function(provider, type, id) {
   function relateToMany(type) {
     var _record = this;
     var _collection = new CollectionService(_provider, type);
-    this['get' + pluralize(toSnakeCase(type))] = function() {
+    this['get' + pluralize(caseConverter.toSnakeCase(type))] = function() {
       _collection = new CollectionService(_provider, type);
-      if (_data[toCamelCase(type) + '_ids']) {
-        var ids = Object.keys(_data[toCamelCase(type) + '_ids']);
+      if (_data[caseConverter.toCamelCase(type) + '_ids']) {
+        var ids = Object.keys(_data[caseConverter.toCamelCase(type) + '_ids']);
         for (var i = 0; i < ids.length; i++) {
           var record = new RecordService(_provider, type, ids[i]);
           _collection.addRecord(record);
@@ -295,13 +297,13 @@ var RecordService = function(provider, type, id) {
       }
       return _collection;
     };
-    this['add' + toSnakeCase(type)] = function(record) {
+    this['add' + caseConverter.toSnakeCase(type)] = function(record) {
       var id = record.getID();
-      var ids = _data[toCamelCase(record.getType()) + '_ids'];
+      var ids = _data[caseConverter.toCamelCase(record.getType()) + '_ids'];
       if (!ids) {
-        _data[toCamelCase(record.getType()) + '_ids'] = {};
+        _data[caseConverter.toCamelCase(record.getType()) + '_ids'] = {};
       }
-      _data[toCamelCase(record.getType()) + '_ids'][id] = true;
+      _data[caseConverter.toCamelCase(record.getType()) + '_ids'][id] = true;
       return _record;
     };
   };
@@ -325,10 +327,10 @@ var RecordService = function(provider, type, id) {
               var relation;
               if (many) {
                 _record.relateToMany(type);
-                relation = eval('_record.get' + pluralize(toSnakeCase(type)) + '()');
+                relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(type)) + '()');
               } else {
                 _record.relateToOne(type);
-                relation = eval('_record.get' + toSnakeCase(type) + '()');
+                relation = eval('_record.get' + caseConverter.toSnakeCase(type) + '()');
               }
               if (relation) {
                 var promise;
@@ -339,7 +341,7 @@ var RecordService = function(provider, type, id) {
                 }
                 promise
                   .then(function(relatedData) {
-                    var key = many ? pluralize(toCamelCase(type)) : toCamelCase(type);
+                    var key = many ? pluralize(caseConverter.toCamelCase(type)) : caseConverter.toCamelCase(type);
                     data[key] = relatedData;
                   });
                 promises.push(promise);
@@ -366,20 +368,6 @@ var RecordService = function(provider, type, id) {
 
 function isDate(object) {
   return Object.prototype.toString.call(object) === '[object Date]'
-}
-
-function toSnakeCase(string) {
-  var words = string.split(' ');
-  var output = '';
-  for (var i = 0; i < words.length; i++) {
-    output = output + words[i].charAt(0).toUpperCase() + words[i].slice(1);
-  }
-  return output;
-}
-
-function toCamelCase(string) {
-  var snakeCase = toSnakeCase(string);
-  return snakeCase.charAt(0).toLowerCase() + snakeCase.slice(1);
 }
 
 function cloneProperties(obj) {
