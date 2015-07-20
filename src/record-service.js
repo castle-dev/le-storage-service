@@ -162,6 +162,8 @@ var RecordService = function(provider, type, id) {
   var _id = id;
   var _data = {};
 
+  var deletedRecordMessage = 'The record has been deleted';
+
   function getType() {
     return _type;
   }
@@ -224,7 +226,7 @@ var RecordService = function(provider, type, id) {
           return;
         }
         if (data.deletedAt) {
-          deferred.reject(new Error('The record has been deleted'));
+          deferred.reject(new Error(deletedRecordMessage));
           return;
         }
         _data = data;
@@ -339,7 +341,7 @@ var RecordService = function(provider, type, id) {
                   relation.load().then(function(data) {
                     loadDeferred.resolve(data);
                   }, function(err) {
-                    if (err.message === 'The record has been deleted') {
+                    if (err.message === deletedRecordMessage) {
                       loadDeferred.resolve();
                     } else {
                       loadDeferred.reject(err);
