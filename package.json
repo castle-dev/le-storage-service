@@ -1,6 +1,6 @@
 {
   "name": "le-storage-service",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "A simple ORM for real-time datastores",
   "main": "src/storage-service.js",
   "scripts": {
