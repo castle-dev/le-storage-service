@@ -162,6 +162,8 @@ var RecordService = function(provider, type, id) {
   var _id = id;
   var _data = {};
 
+  var deletedRecordMessage = 'The record has been deleted';
+
   function getType() {
     return _type;
   }
@@ -224,7 +226,7 @@ var RecordService = function(provider, type, id) {
           return;
         }
         if (data.deletedAt) {
-          deferred.reject(new Error('The record has been deleted'));
+          deferred.reject(new Error(deletedRecordMessage));
           return;
         }
         _data = data;
@@ -335,23 +337,37 @@ var RecordService = function(provider, type, id) {
               if (relation) {
                 var promise;
                 if (args.length === 0) {
-                  promise = relation.load();
+                  var loadDeferred = q.defer();
+                  relation.load().then(function(data) {
+                    loadDeferred.resolve(data);
+                  }, function(err) {
+                    if (err.message === deletedRecordMessage) {
+                      loadDeferred.resolve();
+                    } else {
+                      loadDeferred.reject(err);
+                    }
+                  });
+                  promise = loadDeferred.promise;
                 } else {
                   promise = relation.join.apply(relation, args);
                 }
                 promise
                   .then(function(relatedData) {
-                    var key = many ? pluralize(caseConverter.toCamelCase(type)) : caseConverter.toCamelCase(type);
-                    data[key] = relatedData;
+                    if (relatedData) {
+                      var key = many ? pluralize(caseConverter.toCamelCase(type)) : caseConverter.toCamelCase(type);
+                      data[key] = relatedData;
+                    }
                   });
                 promises.push(promise);
               }
             })(joinConfigs[i].type, joinConfigs[i].many);
           }
         }
-        return q.allSettled(promises)
+        return q.all(promises)
           .then(function() {
             return data;
+          }, function(err) {
+            deferred.reject(err);
           });
       }, function(err) {
         deferred.reject(err);
