@@ -143,6 +143,7 @@ var CollectionService = function(provider, type) {
    * @param {...Object} config a map of properties to join on
    * @param {string} config.type the record type to join by
    * @param {boolean} config.many (optional) join with hasMany relation
+   * @param {boolean} config.as (optional) join with named relation
    * @returns {Promise} promise resolves with the combined data object
    */
   this.join = function() {
@@ -151,7 +152,7 @@ var CollectionService = function(provider, type) {
     var records = _collection.getRecords();
     var promises = [];
     for (var i = 0; i < records.length; i += 1) {
-      promises.push(records[i].join.apply(records[i], arguments)); //TODO: loop over args
+      promises.push(records[i].join.apply(records[i], arguments));
     }
     q.allSettled(promises).then(function(settledPromises) {
       var data = [];

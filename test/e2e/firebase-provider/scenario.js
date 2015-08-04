@@ -141,6 +141,9 @@ function testRecordJoin() {
         rootRecordForJoin.relateToOne('Dog');
         rootRecordForJoin.setDog(singleRelationExisting);
 
+        rootRecordForJoin.relateToMany('Child', 'Favorite');
+        rootRecordForJoin.addFavorite(joinedChildRecord1);
+
         var promises = [];
         promises.push(rootRecordForJoin.save());
         promises.push(deletedRecord.save());
@@ -175,6 +178,19 @@ function testRecordJoin() {
           done();
         }, function(err) {
           console.log(err);
+        });
+      })
+    });
+
+    it('should support named relations', function() {
+      return storage.fetchRecord('Parent', rootRecordForJoin_id).then(function(record) {
+        return record.join({
+          type: 'Child',
+          many: true,
+          as: 'Favorite'
+        }).then(function(data) {
+          expect(data.favorites).to.have.length(1);
+          expect(data.favorites[0]._id).to.equal(joinedChildRecord1_id);
         });
       })
     });
@@ -456,11 +472,11 @@ function testRelatesAs() {
 
 function runTests () {
   describe('le-storage-service e2e tests', function () {
-    /*after(function() {
+    after(function() {
       setTimeout(function() {
         process.exit(0);
       }, 1000);
-    });*/
+    });
     this.timeout(10000);
     testFetchRecord();
     testUpdateRecordWithInvalidData();

@@ -61,6 +61,7 @@ var RecordService = function(provider, type, id) {
    * @param {...(Object|Array)} config a map of properties to join on
    * @param {string} config.type the record type to join by
    * @param {boolean} config.many (optional) join with hasMany relation
+   * @param {boolean} config.as (optional) join with named relation
    * @returns {Promise} promise resolves with the combined data object
    */
   this.join = join;
@@ -368,14 +369,24 @@ var RecordService = function(provider, type, id) {
         var promises = [];
         if (joinConfigs) {
           for (var i = 0; i < joinConfigs.length; i += 1) {
-            (function(type, many) {
+            (function(type, many, as) {
               var relation;
               if (many) {
-                _record.relateToMany(type);
-                relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(type)) + '()');
+                if (as) {
+                  _record.relateToMany(type, as);
+                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(as)) + '()');
+                } else {
+                  _record.relateToMany(type);
+                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(type)) + '()');
+                }
               } else {
-                _record.relateToOne(type);
-                relation = eval('_record.get' + caseConverter.toSnakeCase(type) + '()');
+                if (as) {
+                  _record.relateToOne(type, as);
+                  relation = eval('_record.get' + caseConverter.toSnakeCase(as) + '()');
+                } else {
+                  _record.relateToOne(type);
+                  relation = eval('_record.get' + caseConverter.toSnakeCase(type) + '()');
+                }
               }
               if (relation) {
                 var promise;
@@ -397,13 +408,17 @@ var RecordService = function(provider, type, id) {
                 promise
                   .then(function(relatedData) {
                     if (relatedData) {
-                      var key = many ? pluralize(caseConverter.toCamelCase(type)) : caseConverter.toCamelCase(type);
+                      if (as) {
+                        var key = many ? pluralize(caseConverter.toCamelCase(as)) : caseConverter.toCamelCase(as);
+                      } else {
+                        var key = many ? pluralize(caseConverter.toCamelCase(type)) : caseConverter.toCamelCase(type);
+                      }
                       data[key] = relatedData;
                     }
                   });
                 promises.push(promise);
               }
-            })(joinConfigs[i].type, joinConfigs[i].many);
+            })(joinConfigs[i].type, joinConfigs[i].many, joinConfigs[i].as);
           }
         }
         return q.all(promises)
