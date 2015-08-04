@@ -282,6 +282,7 @@ var RecordService = function(provider, type, id) {
         return record;
       };
       this['set' + caseConverter.toSnakeCase(as)] = function(record) {
+        if (record.getType() !== type) { throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"'); }
         var id = record.getID();
         _data[caseConverter.toCamelCase(as) + '_id'] = id;
         return _record;
@@ -319,6 +320,7 @@ var RecordService = function(provider, type, id) {
         return _collection;
       };
       this['add' + caseConverter.toSnakeCase(as)] = function(record) {
+        if (record.getType() !== type) { throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"'); }
         var id = record.getID();
         var ids = _data[caseConverter.toCamelCase(as) + '_ids'];
         if (!ids) {

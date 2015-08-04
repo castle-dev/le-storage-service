@@ -13,12 +13,6 @@ var storage = new StorageService(provider);
 
 function testUpdateRecordWithInvalidData() {
   describe('update record with invalid data::', function() {
-    after(function() {
-      setTimeout(function() {
-        process.exit(0);
-      }, 1000);
-    });
-    this.timeout(10000);
     it('should reject the promise', function() {
       var record = storage.createRecord('TestRecordType');
       var varName;
@@ -370,9 +364,112 @@ function testFetchCollection() {
   });
 }
 
-testFetchRecord();
-testUpdateRecordWithInvalidData();
-testRecordJoin();
-testCollectionJoin();
-testCollectionLoad();
-testFetchCollection();
+function testRelatesAs() {
+  describe('relates as', function() {
+
+    var catRecord1ID = '1';
+    var catRecord2ID = '2';
+    var dogRecordID = '1';
+    var humanRecordID = '1';
+
+    var catRecord;
+    var catRecord;
+    var dogRecord;
+    var humanRecord;
+
+    before(function(done) {
+      firebaseRef.set({}, function() {
+        catRecord1 = storage.createRecord('Cat', catRecord1ID);
+        catRecord1.setData({
+          "testing": "cat 1",
+          "fieldToCheck": "in collection"
+        });
+        catRecord2 = storage.createRecord('Cat', catRecord2ID);
+        catRecord2.setData({
+          "testing": "cat 2"
+        });
+        dogRecord = storage.createRecord('Dog', dogRecordID);
+        dogRecord.setData({
+          "testing": "dog",
+          "name": "buddy"
+        });
+        humanRecord = storage.createRecord('Human', humanRecordID);
+        humanRecord.setData({
+          "testing": "human"
+        });
+
+
+        var promises = [];
+        promises.push(catRecord1.save());
+        promises.push(catRecord2.save());
+        promises.push(dogRecord.save());
+        promises.push(humanRecord.save());
+
+        q.all(promises).then(function() {
+          done();
+        }, function(err) {
+          console.log(err);
+        });
+      });
+    });
+
+    it('should relate cats as pets', function () {
+      humanRecord.relateToMany('Cat', 'Pet');
+      humanRecord.addPet(catRecord1);
+      humanRecord.addPet(catRecord2);
+      return humanRecord.save()
+      .then(function () {
+        expect(humanRecord.getData()['pet_ids'][catRecord1ID]).to.be.true;
+        expect(humanRecord.getData()['pet_ids'][catRecord2ID]).to.be.true;
+        return humanRecord.getPets().load();
+      })
+      .then(function (pets) {
+        expect(pets).to.have.length(2);
+      });
+    });
+
+    it('should relate dog as best friend', function () {
+      humanRecord.relateToOne('Dog', 'Best Friend');
+      humanRecord.setBestFriend(dogRecord);
+      return humanRecord.save()
+      .then(function () {
+        expect(humanRecord.getData()['bestFriend_id']).to.equal(dogRecordID);
+        return humanRecord.getBestFriend().load();
+      })
+      .then(function (bestFriend) {
+        expect(bestFriend.name).to.equal('buddy');
+      });
+    });
+
+    it('should not mix types when relating as', function () {
+      humanRecord.relateToMany('Cat', 'Pet');
+      expect(function () {
+        humanRecord.addPet(dogRecord);
+      }).to.throw();
+      dogRecord.relateToOne('Human', 'Owner');
+      expect(function () {
+        dogRecord.setOwner(catRecord1);
+      }).to.throw();
+    });
+  });
+}
+
+function runTests () {
+  describe('le-storage-service e2e tests', function () {
+    /*after(function() {
+      setTimeout(function() {
+        process.exit(0);
+      }, 1000);
+    });*/
+    this.timeout(10000);
+    testFetchRecord();
+    testUpdateRecordWithInvalidData();
+    testRecordJoin();
+    testCollectionJoin();
+    testCollectionLoad();
+    testFetchCollection();
+    testRelatesAs();
+  });
+}
+
+runTests();
