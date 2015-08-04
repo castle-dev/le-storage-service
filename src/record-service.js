@@ -268,21 +268,37 @@ var RecordService = function(provider, type, id) {
     _provider.unsync(pluralize(caseConverter.toCamelCase(_type)), _id);
   }
 
-  function relateToOne(type) {
+  function relateToOne(type, as) {
     var _record = this;
-    this['get' + caseConverter.toSnakeCase(type)] = function() {
-      var id = _data[caseConverter.toCamelCase(type) + '_id'];
-      if (!id) {
-        return;
-      }
-      var record = new RecordService(_provider, type, id);
-      return record;
-    };
-    this['set' + caseConverter.toSnakeCase(type)] = function(record) {
-      var id = record.getID();
-      _data[caseConverter.toCamelCase(record.getType()) + '_id'] = id;
-      return _record;
-    };
+    if (as) {
+      this['get' + caseConverter.toSnakeCase(as)] = function() {
+        var id = _data[caseConverter.toCamelCase(as) + '_id'];
+        if (!id) {
+          return;
+        }
+        var record = new RecordService(_provider, type, id);
+        return record;
+      };
+      this['set' + caseConverter.toSnakeCase(as)] = function(record) {
+        var id = record.getID();
+        _data[caseConverter.toCamelCase(as) + '_id'] = id;
+        return _record;
+      };
+    } else {
+      this['get' + caseConverter.toSnakeCase(type)] = function() {
+        var id = _data[caseConverter.toCamelCase(type) + '_id'];
+        if (!id) {
+          return;
+        }
+        var record = new RecordService(_provider, type, id);
+        return record;
+      };
+      this['set' + caseConverter.toSnakeCase(type)] = function(record) {
+        var id = record.getID();
+        _data[caseConverter.toCamelCase(record.getType()) + '_id'] = id;
+        return _record;
+      };
+    }
   };
 
   function relateToMany(type) {

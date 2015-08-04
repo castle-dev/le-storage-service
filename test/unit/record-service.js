@@ -134,6 +134,16 @@ describe('RecordService', function() {
     expect(record.getPerson).not.to.be.undefined;
     expect(record.setPerson).not.to.be.undefined;
   });
+  it('should support named one-to-one relations', function() {
+    var record = new RecordService(mockStorageProvider, type, id);
+    expect(record.getPerson).to.be.undefined;
+    expect(record.setPerson).to.be.undefined;
+    record.relateToOne('Cat', 'Pet');
+    expect(record.getPet).not.to.be.undefined;
+    expect(record.setPet).not.to.be.undefined;
+    expect(record.getCat).to.be.undefined;
+    expect(record.setCat).to.be.undefined;
+  });
   it('should relate one record to many others', function() {
     var record = new RecordService(mockStorageProvider, type, id);
     expect(record.getToys).to.be.undefined;
