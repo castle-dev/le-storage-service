@@ -13,6 +13,7 @@ var storage = new StorageService(provider);
 
 function testUpdateRecordWithInvalidData() {
   describe('update record with invalid data::', function() {
+    this.timeout(10000);
     it('should reject the promise', function() {
       var record = storage.createRecord('TestRecordType');
       var varName;
@@ -26,6 +27,7 @@ function testUpdateRecordWithInvalidData() {
 
 function testFetchRecord() {
   describe('fetch record::', function() {
+    this.timeout(10000);
 
     var recordToFetch_id;
     var deletedRecord_id;
@@ -88,6 +90,7 @@ function testFetchRecord() {
 
 function testRecordJoin() {
   describe('Record Join', function() {
+    this.timeout(10000);
 
     var rootRecordForJoin_id = 'rootRecordForJoin_id';
     var joinedChildRecord1_id = 'joinedChildRecord1_id';
@@ -199,6 +202,7 @@ function testRecordJoin() {
 
 function testCollectionJoin() {
   describe('Collection Join', function() {
+    this.timeout(10000);
 
     var rootRecord1ID = 'rootRecord1ID';
     var rootDeletedRecordID = 'rootDeletedRecordID';
@@ -248,6 +252,7 @@ function testCollectionJoin() {
 
 function testCollectionLoad() {
   describe('Collection Load', function() {
+    this.timeout(10000);
 
     var rootRecord1ID = 'rootRecord1ID';
     var rootDeletedRecordID = 'rootDeletedRecordID';
@@ -297,6 +302,7 @@ function testCollectionLoad() {
 
 function testFetchCollection() {
   describe('fetchCollection', function() {
+    this.timeout(10000);
 
     var catRecord1ID = 'catRecord1ID';
     var catRecord2ID = 'catRecord2ID';
@@ -382,6 +388,7 @@ function testFetchCollection() {
 
 function testRelatesAs() {
   describe('relates as', function() {
+    this.timeout(10000);
 
     var catRecord1ID = '1';
     var catRecord2ID = '2';
@@ -472,12 +479,12 @@ function testRelatesAs() {
 
 function runTests () {
   describe('le-storage-service e2e tests', function () {
+    this.timeout(10000);
     after(function() {
       setTimeout(function() {
         process.exit(0);
       }, 1000);
     });
-    this.timeout(10000);
     testFetchRecord();
     testUpdateRecordWithInvalidData();
     testRecordJoin();
