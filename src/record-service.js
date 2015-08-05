@@ -275,7 +275,7 @@ var RecordService = function(provider, type, id) {
     var _record = this;
     if (as) {
       this['get' + caseConverter.toSnakeCase(as)] = function() {
-        var id = _data[caseConverter.toCamelCase(as) + '_id'];
+        var id = _data[caseConverter.toCamelCase(as)];
         if (!id) {
           return;
         }
@@ -283,9 +283,11 @@ var RecordService = function(provider, type, id) {
         return record;
       };
       this['set' + caseConverter.toSnakeCase(as)] = function(record) {
-        if (record.getType() !== type) { throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"'); }
+        if (record.getType() !== type) {
+          throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"');
+        }
         var id = record.getID();
-        _data[caseConverter.toCamelCase(as) + '_id'] = id;
+        _data[caseConverter.toCamelCase(as)] = id;
         return _record;
       };
     } else {
@@ -311,8 +313,8 @@ var RecordService = function(provider, type, id) {
     if (as) {
       this['get' + pluralize(caseConverter.toSnakeCase(as))] = function() {
         _collection = new CollectionService(_provider, type);
-        if (_data[caseConverter.toCamelCase(as) + '_ids']) {
-          var ids = Object.keys(_data[caseConverter.toCamelCase(as) + '_ids']);
+        if (_data[caseConverter.toCamelCase(as)]) {
+          var ids = Object.keys(_data[caseConverter.toCamelCase(as)]);
           for (var i = 0; i < ids.length; i++) {
             var record = new RecordService(_provider, type, ids[i]);
             _collection.addRecord(record);
@@ -321,13 +323,15 @@ var RecordService = function(provider, type, id) {
         return _collection;
       };
       this['add' + caseConverter.toSnakeCase(as)] = function(record) {
-        if (record.getType() !== type) { throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"'); }
-        var id = record.getID();
-        var ids = _data[caseConverter.toCamelCase(as) + '_ids'];
-        if (!ids) {
-          _data[caseConverter.toCamelCase(as) + '_ids'] = {};
+        if (record.getType() !== type) {
+          throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"');
         }
-        _data[caseConverter.toCamelCase(as) + '_ids'][id] = true;
+        var id = record.getID();
+        var ids = _data[caseConverter.toCamelCase(as)];
+        if (!ids) {
+          _data[caseConverter.toCamelCase(as)] = {};
+        }
+        _data[caseConverter.toCamelCase(as)][id] = true;
         return _record;
       };
     } else {

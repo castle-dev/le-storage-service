@@ -436,49 +436,49 @@ function testRelatesAs() {
       });
     });
 
-    it('should relate cats as pets', function () {
+    it('should relate cats as pets', function() {
       humanRecord.relateToMany('Cat', 'Pet');
       humanRecord.addPet(catRecord1);
       humanRecord.addPet(catRecord2);
       return humanRecord.save()
-      .then(function () {
-        expect(humanRecord.getData()['pet_ids'][catRecord1ID]).to.be.true;
-        expect(humanRecord.getData()['pet_ids'][catRecord2ID]).to.be.true;
-        return humanRecord.getPets().load();
-      })
-      .then(function (pets) {
-        expect(pets).to.have.length(2);
-      });
+        .then(function() {
+          expect(humanRecord.getData()['pet'][catRecord1ID]).to.be.true;
+          expect(humanRecord.getData()['pet'][catRecord2ID]).to.be.true;
+          return humanRecord.getPets().load();
+        })
+        .then(function(pets) {
+          expect(pets).to.have.length(2);
+        });
     });
 
-    it('should relate dog as best friend', function () {
+    it('should relate dog as best friend', function() {
       humanRecord.relateToOne('Dog', 'Best Friend');
       humanRecord.setBestFriend(dogRecord);
       return humanRecord.save()
-      .then(function () {
-        expect(humanRecord.getData()['bestFriend_id']).to.equal(dogRecordID);
-        return humanRecord.getBestFriend().load();
-      })
-      .then(function (bestFriend) {
-        expect(bestFriend.name).to.equal('buddy');
-      });
+        .then(function() {
+          expect(humanRecord.getData()['bestFriend']).to.equal(dogRecordID);
+          return humanRecord.getBestFriend().load();
+        })
+        .then(function(bestFriend) {
+          expect(bestFriend.name).to.equal('buddy');
+        });
     });
 
-    it('should not mix types when relating as', function () {
+    it('should not mix types when relating as', function() {
       humanRecord.relateToMany('Cat', 'Pet');
-      expect(function () {
+      expect(function() {
         humanRecord.addPet(dogRecord);
       }).to.throw();
       dogRecord.relateToOne('Human', 'Owner');
-      expect(function () {
+      expect(function() {
         dogRecord.setOwner(catRecord1);
       }).to.throw();
     });
   });
 }
 
-function runTests () {
-  describe('le-storage-service e2e tests', function () {
+function runTests() {
+  describe('le-storage-service e2e tests', function() {
     this.timeout(10000);
     after(function() {
       setTimeout(function() {
