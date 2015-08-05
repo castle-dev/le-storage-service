@@ -134,6 +134,16 @@ describe('RecordService', function() {
     expect(record.getPerson).not.to.be.undefined;
     expect(record.setPerson).not.to.be.undefined;
   });
+  it('should support named one-to-one relations', function() {
+    var record = new RecordService(mockStorageProvider, type, id);
+    expect(record.getPerson).to.be.undefined;
+    expect(record.setPerson).to.be.undefined;
+    record.relateToOne('Cat', 'Pet');
+    expect(record.getPet).not.to.be.undefined;
+    expect(record.setPet).not.to.be.undefined;
+    expect(record.getCat).to.be.undefined;
+    expect(record.setCat).to.be.undefined;
+  });
   it('should relate one record to many others', function() {
     var record = new RecordService(mockStorageProvider, type, id);
     expect(record.getToys).to.be.undefined;
@@ -141,6 +151,16 @@ describe('RecordService', function() {
     record.relateToMany('Toy');
     expect(record.getToys).not.to.be.undefined;
     expect(record.addToy).not.to.be.undefined;
+  });
+  it('should support named one-to-many relations', function() {
+    var record = new RecordService(mockStorageProvider, type, id);
+    expect(record.getToys).to.be.undefined;
+    expect(record.addToy).to.be.undefined;
+    record.relateToMany('Toy', 'Gift');
+    expect(record.getGifts).not.to.be.undefined;
+    expect(record.addGift).not.to.be.undefined;
+    expect(record.getToys).to.be.undefined;
+    expect(record.addToy).to.be.undefined;
   });
   it('should store and retrive data locally', function() {
     var record = new RecordService(mockStorageProvider, type, id);

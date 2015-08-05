@@ -38,15 +38,17 @@
     "gulp-jsdoc": "^0.1.4",
     "gulp-mocha": "^2.0.1",
     "gulp-rename": "^1.2.2",
+    "gulp-run-sequence": "^0.3.2",
     "gulp-tag-version": "^1.2.1",
     "gulp-util": "^3.0.4",
-    "le-storage-provider-firebase": "^2.0.3",
+    "le-storage-provider-firebase": "^2.1.0",
     "mocha": "^2.2.1",
     "run-sequence": "^1.0.2",
     "sinon": "^1.14.1",
     "sinon-chai": "^2.7.0"
   },
   "dependencies": {
+    "le-storage-provider-firebase": "^2.1.0",
     "pluralize": "^1.1.2",
     "q": "^1.2.0"
   }

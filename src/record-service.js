@@ -61,6 +61,7 @@ var RecordService = function(provider, type, id) {
    * @param {...(Object|Array)} config a map of properties to join on
    * @param {string} config.type the record type to join by
    * @param {boolean} config.many (optional) join with hasMany relation
+   * @param {boolean} config.as (optional) join with named relation
    * @returns {Promise} promise resolves with the combined data object
    */
   this.join = join;
@@ -84,6 +85,7 @@ var RecordService = function(provider, type, id) {
    * @memberof RecordService
    * @instance
    * @param {string} type the type of record this record has many of
+   * @param {string} as (optional) the name of the relation
    */
   this.relateToMany = relateToMany;
 
@@ -97,6 +99,7 @@ var RecordService = function(provider, type, id) {
    * @memberof RecordService
    * @instance
    * @param {string} type the type of record this record has one of
+   * @param {string} as (optional) the name of the relation
    */
   this.relateToOne = relateToOne;
 
@@ -268,46 +271,87 @@ var RecordService = function(provider, type, id) {
     _provider.unsync(pluralize(caseConverter.toCamelCase(_type)), _id);
   }
 
-  function relateToOne(type) {
+  function relateToOne(type, as) {
     var _record = this;
-    this['get' + caseConverter.toSnakeCase(type)] = function() {
-      var id = _data[caseConverter.toCamelCase(type) + '_id'];
-      if (!id) {
-        return;
-      }
-      var record = new RecordService(_provider, type, id);
-      return record;
-    };
-    this['set' + caseConverter.toSnakeCase(type)] = function(record) {
-      var id = record.getID();
-      _data[caseConverter.toCamelCase(record.getType()) + '_id'] = id;
-      return _record;
-    };
+    if (as) {
+      this['get' + caseConverter.toSnakeCase(as)] = function() {
+        var id = _data[caseConverter.toCamelCase(as) + '_id'];
+        if (!id) {
+          return;
+        }
+        var record = new RecordService(_provider, type, id);
+        return record;
+      };
+      this['set' + caseConverter.toSnakeCase(as)] = function(record) {
+        if (record.getType() !== type) { throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"'); }
+        var id = record.getID();
+        _data[caseConverter.toCamelCase(as) + '_id'] = id;
+        return _record;
+      };
+    } else {
+      this['get' + caseConverter.toSnakeCase(type)] = function() {
+        var id = _data[caseConverter.toCamelCase(type) + '_id'];
+        if (!id) {
+          return;
+        }
+        var record = new RecordService(_provider, type, id);
+        return record;
+      };
+      this['set' + caseConverter.toSnakeCase(type)] = function(record) {
+        var id = record.getID();
+        _data[caseConverter.toCamelCase(record.getType()) + '_id'] = id;
+        return _record;
+      };
+    }
   };
 
-  function relateToMany(type) {
+  function relateToMany(type, as) {
     var _record = this;
-    var _collection = new CollectionService(_provider, type);
-    this['get' + pluralize(caseConverter.toSnakeCase(type))] = function() {
-      _collection = new CollectionService(_provider, type);
-      if (_data[caseConverter.toCamelCase(type) + '_ids']) {
-        var ids = Object.keys(_data[caseConverter.toCamelCase(type) + '_ids']);
-        for (var i = 0; i < ids.length; i++) {
-          var record = new RecordService(_provider, type, ids[i]);
-          _collection.addRecord(record);
+    var _collection;
+    if (as) {
+      this['get' + pluralize(caseConverter.toSnakeCase(as))] = function() {
+        _collection = new CollectionService(_provider, type);
+        if (_data[caseConverter.toCamelCase(as) + '_ids']) {
+          var ids = Object.keys(_data[caseConverter.toCamelCase(as) + '_ids']);
+          for (var i = 0; i < ids.length; i++) {
+            var record = new RecordService(_provider, type, ids[i]);
+            _collection.addRecord(record);
+          }
         }
-      }
-      return _collection;
-    };
-    this['add' + caseConverter.toSnakeCase(type)] = function(record) {
-      var id = record.getID();
-      var ids = _data[caseConverter.toCamelCase(record.getType()) + '_ids'];
-      if (!ids) {
-        _data[caseConverter.toCamelCase(record.getType()) + '_ids'] = {};
-      }
-      _data[caseConverter.toCamelCase(record.getType()) + '_ids'][id] = true;
-      return _record;
-    };
+        return _collection;
+      };
+      this['add' + caseConverter.toSnakeCase(as)] = function(record) {
+        if (record.getType() !== type) { throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"'); }
+        var id = record.getID();
+        var ids = _data[caseConverter.toCamelCase(as) + '_ids'];
+        if (!ids) {
+          _data[caseConverter.toCamelCase(as) + '_ids'] = {};
+        }
+        _data[caseConverter.toCamelCase(as) + '_ids'][id] = true;
+        return _record;
+      };
+    } else {
+      this['get' + pluralize(caseConverter.toSnakeCase(type))] = function() {
+        _collection = new CollectionService(_provider, type);
+        if (_data[caseConverter.toCamelCase(type) + '_ids']) {
+          var ids = Object.keys(_data[caseConverter.toCamelCase(type) + '_ids']);
+          for (var i = 0; i < ids.length; i++) {
+            var record = new RecordService(_provider, type, ids[i]);
+            _collection.addRecord(record);
+          }
+        }
+        return _collection;
+      };
+      this['add' + caseConverter.toSnakeCase(type)] = function(record) {
+        var id = record.getID();
+        var ids = _data[caseConverter.toCamelCase(record.getType()) + '_ids'];
+        if (!ids) {
+          _data[caseConverter.toCamelCase(record.getType()) + '_ids'] = {};
+        }
+        _data[caseConverter.toCamelCase(record.getType()) + '_ids'][id] = true;
+        return _record;
+      };
+    }
   };
 
   function join() {
@@ -325,14 +369,24 @@ var RecordService = function(provider, type, id) {
         var promises = [];
         if (joinConfigs) {
           for (var i = 0; i < joinConfigs.length; i += 1) {
-            (function(type, many) {
+            (function(type, many, as) {
               var relation;
               if (many) {
-                _record.relateToMany(type);
-                relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(type)) + '()');
+                if (as) {
+                  _record.relateToMany(type, as);
+                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(as)) + '()');
+                } else {
+                  _record.relateToMany(type);
+                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(type)) + '()');
+                }
               } else {
-                _record.relateToOne(type);
-                relation = eval('_record.get' + caseConverter.toSnakeCase(type) + '()');
+                if (as) {
+                  _record.relateToOne(type, as);
+                  relation = eval('_record.get' + caseConverter.toSnakeCase(as) + '()');
+                } else {
+                  _record.relateToOne(type);
+                  relation = eval('_record.get' + caseConverter.toSnakeCase(type) + '()');
+                }
               }
               if (relation) {
                 var promise;
@@ -354,13 +408,17 @@ var RecordService = function(provider, type, id) {
                 promise
                   .then(function(relatedData) {
                     if (relatedData) {
-                      var key = many ? pluralize(caseConverter.toCamelCase(type)) : caseConverter.toCamelCase(type);
+                      if (as) {
+                        var key = many ? pluralize(caseConverter.toCamelCase(as)) : caseConverter.toCamelCase(as);
+                      } else {
+                        var key = many ? pluralize(caseConverter.toCamelCase(type)) : caseConverter.toCamelCase(type);
+                      }
                       data[key] = relatedData;
                     }
                   });
                 promises.push(promise);
               }
-            })(joinConfigs[i].type, joinConfigs[i].many);
+            })(joinConfigs[i].type, joinConfigs[i].many, joinConfigs[i].as);
           }
         }
         return q.all(promises)

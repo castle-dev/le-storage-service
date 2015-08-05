@@ -48,7 +48,7 @@ var StorageService = function(provider) {
    * @param {string} type the type of records in collection, required
    * @param {string} orderBy the name of the field to order the records by
    *                         and to check the equalTo value against, required if using equalTo
-   * @param {string, number, null, or boolean} equalTo the value to compare the field
+   * @param {string|number|null|boolean} equalTo the value to compare the field
    *                         specified in orderBy against and only add records that
    *                         have the matching value in the specified field
    * @param {number} limit the maximum number of records to be placed in the collection
