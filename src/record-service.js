@@ -313,8 +313,8 @@ var RecordService = function(provider, type, id) {
     if (as) {
       this['get' + pluralize(caseConverter.toSnakeCase(as))] = function() {
         _collection = new CollectionService(_provider, type);
-        if (_data[caseConverter.toCamelCase(as)]) {
-          var ids = Object.keys(_data[caseConverter.toCamelCase(as)]);
+        if (_data[pluralize(caseConverter.toCamelCase(as))]) {
+          var ids = Object.keys(_data[pluralize(caseConverter.toCamelCase(as))]);
           for (var i = 0; i < ids.length; i++) {
             var record = new RecordService(_provider, type, ids[i]);
             _collection.addRecord(record);
@@ -327,11 +327,11 @@ var RecordService = function(provider, type, id) {
           throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"');
         }
         var id = record.getID();
-        var ids = _data[caseConverter.toCamelCase(as)];
+        var ids = _data[pluralize(caseConverter.toCamelCase(as))];
         if (!ids) {
-          _data[caseConverter.toCamelCase(as)] = {};
+          _data[pluralize(caseConverter.toCamelCase(as))] = {};
         }
-        _data[caseConverter.toCamelCase(as)][id] = true;
+        _data[pluralize(caseConverter.toCamelCase(as))][id] = true;
         return _record;
       };
     } else {

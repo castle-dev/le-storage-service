@@ -442,8 +442,8 @@ function testRelatesAs() {
       humanRecord.addPet(catRecord2);
       return humanRecord.save()
         .then(function() {
-          expect(humanRecord.getData()['pet'][catRecord1ID]).to.be.true;
-          expect(humanRecord.getData()['pet'][catRecord2ID]).to.be.true;
+          expect(humanRecord.getData()['pets'][catRecord1ID]).to.be.true;
+          expect(humanRecord.getData()['pets'][catRecord2ID]).to.be.true;
           return humanRecord.getPets().load();
         })
         .then(function(pets) {
