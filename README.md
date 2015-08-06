@@ -38,7 +38,7 @@ required when constructing the storage object.
 
 ## Contributing
 
-Please follow the project's [conventions](https://github.com/castle-dev/le-storage-service/blob/master/CONTRIBUTING.md) or your changes will not be accepted
+Please follow the project's [conventions](https://github.com/castle-dev/le-storage-service/blob/develop/CONTRIBUTING.md) or your changes will not be accepted
 
 ## Release History
 
