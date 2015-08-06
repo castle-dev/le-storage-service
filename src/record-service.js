@@ -33,7 +33,7 @@ var RecordService = function(provider, type, id) {
   this.getData = getData;
 
   /**
-   * Returns this record's type
+   * Returns this record's ID
    * @function getID
    * @memberof RecordService
    * @instance
