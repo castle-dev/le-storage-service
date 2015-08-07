@@ -334,6 +334,14 @@ var RecordService = function(provider, type, id) {
         _data[pluralize(caseConverter.toCamelCase(as))][id] = true;
         return _record;
       };
+      this['remove' + caseConverter.toSnakeCase(as)] = function(record) {
+        if (record.getType() !== type) {
+          throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"');
+        }
+        var id = record.getID();
+        delete _data[pluralize(caseConverter.toCamelCase(as))][id];
+        return _record;
+      };
     } else {
       this['get' + pluralize(caseConverter.toSnakeCase(type))] = function() {
         _collection = new CollectionService(_provider, type);
@@ -353,6 +361,11 @@ var RecordService = function(provider, type, id) {
           _data[caseConverter.toCamelCase(record.getType()) + '_ids'] = {};
         }
         _data[caseConverter.toCamelCase(record.getType()) + '_ids'][id] = true;
+        return _record;
+      };
+      this['remove' + caseConverter.toSnakeCase(type)] = function(record) {
+        var id = record.getID();
+        delete _data[caseConverter.toCamelCase(record.getType()) + '_ids'][id];
         return _record;
       };
     }
