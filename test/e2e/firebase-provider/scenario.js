@@ -16,7 +16,7 @@ function testUpdateRecordWithInvalidData() {
     this.timeout(10000);
     it('should reject the promise', function() {
       var record = storage.createRecord('TestRecordType');
-      var varName;
+      var varName = function() {};
       var returnedPromise = record.update({
         testRecordKey: varName
       });
