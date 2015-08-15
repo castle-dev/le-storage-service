@@ -477,6 +477,46 @@ function testRelatesAs() {
   });
 }
 
+function testSave() {
+  describe('record save() method', function() {
+    it('should be able to save with undefined set for some fields', function(done) {
+      var record = storage.createRecord('Example');
+      var recordData = {
+        exampleField: 1234
+      };
+      recordData.undefinedField = undefined;
+      record.setData(recordData);
+      record.save().then(function() {
+        done();
+      }, function(err) {
+        console.log(err);
+      });
+
+    });
+    it('should removed a set field if it is saved as undefined', function(done) {
+      var record = storage.createRecord('Example');
+      var recordData = {
+        exampleField: 1234,
+        fieldToRemove: 3242
+      };
+      record.setData(recordData);
+      record.save().then(function() {
+        recordData.fieldToRemove = undefined;
+        record.setData(recordData);
+        return record.save();
+      }).then(function() {
+        return storage.fetchRecord('Example', record.getID());
+      }).then(function(returnedRecord) {
+        expect(returnedRecord.getData().exampleField).to.exist;
+        expect(returnedRecord.getData().fieldToRemove).not.to.exist;
+        done();
+      }, function(err) {
+        console.log(err);
+      })
+    });
+  })
+}
+
 function runTests() {
   describe('le-storage-service e2e tests', function() {
     this.timeout(10000);
@@ -492,6 +532,7 @@ function runTests() {
     testCollectionLoad();
     testFetchCollection();
     testRelatesAs();
+    testSave();
   });
 }
 
