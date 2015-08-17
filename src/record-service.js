@@ -199,6 +199,12 @@ var RecordService = function(provider, type, id) {
       delete _data._id
     }
     _data.lastUpdatedAt = new Date();
+    var dataKey;
+    for (dataKey in _data) {
+      if (!_data[dataKey]) {
+        delete _data[dataKey];
+      }
+    }
     return _provider.save(pluralize(caseConverter.toCamelCase(_type)), _id, cloneProperties(_data))
       .then(function(id) {
         _id = id;
