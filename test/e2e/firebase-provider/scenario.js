@@ -493,7 +493,7 @@ function testSave() {
       });
 
     });
-    it('should removed a set field if it is saved as undefined', function(done) {
+    it('should remove a set field if it is saved as undefined', function(done) {
       var record = storage.createRecord('Example');
       var recordData = {
         exampleField: 1234,
@@ -513,6 +513,22 @@ function testSave() {
       }, function(err) {
         console.log(err);
       })
+    });
+    it('should be able to save fields with values like 0 and false', function(done) {
+      var record = storage.createRecord('Example');
+      var recordData = {
+        exampleField: 0,
+        otherExampleField: false
+      };
+      recordData.undefinedField = undefined;
+      record.setData(recordData);
+      record.save().then(function(returnedRecord) {
+        expect(returnedRecord.getData().exampleField).to.equal(0);
+        expect(returnedRecord.getData().otherExampleField).to.equal(false);
+        done();
+      }, function(err) {
+        console.log(err);
+      });
     });
   })
 }

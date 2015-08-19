@@ -201,7 +201,7 @@ var RecordService = function(provider, type, id) {
     _data.lastUpdatedAt = new Date();
     var dataKey;
     for (dataKey in _data) {
-      if (!_data[dataKey]) {
+      if (typeof _data[dataKey] == 'undefined') {
         delete _data[dataKey];
       }
     }
