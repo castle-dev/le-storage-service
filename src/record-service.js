@@ -345,7 +345,9 @@ var RecordService = function(provider, type, id) {
           throw new Error('Invalid type. Expecting "' + type + '", but saw "' + record.getType() + '"');
         }
         var id = record.getID();
-        delete _data[pluralize(caseConverter.toCamelCase(as))][id];
+        if (_data[pluralize(caseConverter.toCamelCase(as))]) {
+          delete _data[pluralize(caseConverter.toCamelCase(as))][id];
+        }
         return _record;
       };
     } else {
