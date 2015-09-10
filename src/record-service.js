@@ -81,6 +81,8 @@ var RecordService = function(provider, type, id) {
    * After calling this, the record will have addType(record) and
    * getTypes() methods. Example: Calling person.relateToMany('Device') will
    * expose addDevice(device) and getDevices() methods on the person record
+   *
+   * Note: the getTypes method is deprecated, please prefer the join method
    * @function relateToMany
    * @memberof RecordService
    * @instance
@@ -95,6 +97,8 @@ var RecordService = function(provider, type, id) {
    * After calling this, the record will have setType(record) and
    * getType() methods. Example: Calling person.relateToOne('Car') will
    * expose setCar(car) and getCar() methods on the person record
+   *
+   * Note: the getType method is deprecated, please prefer the join method
    * @function relateToOne
    * @memberof RecordService
    * @instance
@@ -281,6 +285,7 @@ var RecordService = function(provider, type, id) {
     var _record = this;
     if (as) {
       this['get' + caseConverter.toSnakeCase(as)] = function() {
+        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
         var id = _data[caseConverter.toCamelCase(as)];
         if (!id) {
           return;
@@ -298,6 +303,7 @@ var RecordService = function(provider, type, id) {
       };
     } else {
       this['get' + caseConverter.toSnakeCase(type)] = function() {
+        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
         var id = _data[caseConverter.toCamelCase(type) + '_id'];
         if (!id) {
           return;
@@ -318,6 +324,7 @@ var RecordService = function(provider, type, id) {
     var _collection;
     if (as) {
       this['get' + pluralize(caseConverter.toSnakeCase(as))] = function() {
+        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
         _collection = new CollectionService(_provider, type);
         if (_data[pluralize(caseConverter.toCamelCase(as))]) {
           var ids = Object.keys(_data[pluralize(caseConverter.toCamelCase(as))]);
@@ -352,6 +359,7 @@ var RecordService = function(provider, type, id) {
       };
     } else {
       this['get' + pluralize(caseConverter.toSnakeCase(type))] = function() {
+        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
         _collection = new CollectionService(_provider, type);
         if (_data[caseConverter.toCamelCase(type) + '_ids']) {
           var ids = Object.keys(_data[caseConverter.toCamelCase(type) + '_ids']);
