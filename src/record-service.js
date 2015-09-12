@@ -284,8 +284,10 @@ var RecordService = function(provider, type, id) {
   function relateToOne(type, as) {
     var _record = this;
     if (as) {
-      this['get' + caseConverter.toSnakeCase(as)] = function() {
-        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
+      this['get' + caseConverter.toSnakeCase(as)] = function(isPrivate) {
+        if (!isPrivate) {
+          console.warn('DEPRECATED. Please prefer the join method for fetching related data');
+        }
         var id = _data[caseConverter.toCamelCase(as)];
         if (!id) {
           return;
@@ -302,8 +304,10 @@ var RecordService = function(provider, type, id) {
         return _record;
       };
     } else {
-      this['get' + caseConverter.toSnakeCase(type)] = function() {
-        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
+      this['get' + caseConverter.toSnakeCase(type)] = function(isPrivate) {
+        if (!isPrivate) {
+          console.warn('DEPRECATED. Please prefect the join method for fetching related data');
+        }
         var id = _data[caseConverter.toCamelCase(type) + '_id'];
         if (!id) {
           return;
@@ -323,8 +327,10 @@ var RecordService = function(provider, type, id) {
     var _record = this;
     var _collection;
     if (as) {
-      this['get' + pluralize(caseConverter.toSnakeCase(as))] = function() {
-        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
+      this['get' + pluralize(caseConverter.toSnakeCase(as))] = function(isPrivate) {
+        if (!isPrivate) {
+          console.warn('DEPRECATED. Please prefer the join method for fetching related data');
+        }
         _collection = new CollectionService(_provider, type);
         if (_data[pluralize(caseConverter.toCamelCase(as))]) {
           var ids = Object.keys(_data[pluralize(caseConverter.toCamelCase(as))]);
@@ -358,8 +364,10 @@ var RecordService = function(provider, type, id) {
         return _record;
       };
     } else {
-      this['get' + pluralize(caseConverter.toSnakeCase(type))] = function() {
-        console.warn('DEPRECATED. Please prefect the join method for fetching related data');
+      this['get' + pluralize(caseConverter.toSnakeCase(type))] = function(isPrivate) {
+        if (!isPrivate) {
+          console.warn('DEPRECATED. Please prefer the join method for fetching related data');
+        }
         _collection = new CollectionService(_provider, type);
         if (_data[caseConverter.toCamelCase(type) + '_ids']) {
           var ids = Object.keys(_data[caseConverter.toCamelCase(type) + '_ids']);
@@ -407,18 +415,18 @@ var RecordService = function(provider, type, id) {
               if (many) {
                 if (as) {
                   _record.relateToMany(type, as);
-                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(as)) + '()');
+                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(as)) + '(true)');
                 } else {
                   _record.relateToMany(type);
-                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(type)) + '()');
+                  relation = eval('_record.get' + pluralize(caseConverter.toSnakeCase(type)) + '(true)');
                 }
               } else {
                 if (as) {
                   _record.relateToOne(type, as);
-                  relation = eval('_record.get' + caseConverter.toSnakeCase(as) + '()');
+                  relation = eval('_record.get' + caseConverter.toSnakeCase(as) + '(true)');
                 } else {
                   _record.relateToOne(type);
-                  relation = eval('_record.get' + caseConverter.toSnakeCase(type) + '()');
+                  relation = eval('_record.get' + caseConverter.toSnakeCase(type) + '(true)');
                 }
               }
               if (relation) {
