@@ -196,9 +196,6 @@ var RecordService = function(provider, type, id) {
 
   function save() {
     var record = this;
-    if (!_data.createdAt) {
-      _data.createdAt = new Date();
-    }
     if (_data._id) {
       delete _data._id
     }
@@ -209,12 +206,30 @@ var RecordService = function(provider, type, id) {
         delete _data[dataKey];
       }
     }
-    return _provider.save(pluralize(caseConverter.toCamelCase(_type)), _id, cloneProperties(_data))
-      .then(function(id) {
-        _id = id;
-        return record;
-      });
+    return setCreatedAtOnData().then(function() {
+      return _provider.save(pluralize(caseConverter.toCamelCase(_type)), _id, cloneProperties(_data))
+        .then(function(id) {
+          _id = id;
+          return record;
+        });
+    });
   };
+
+  function setCreatedAtOnData() {
+    if (_id) {
+      return _provider.load(pluralize(caseConverter.toCamelCase(_type)), _id)
+        .then(function(data) {
+          if (!data) {
+            _data.createdAt = new Date();
+          } else {
+            _data.createdAt = data.createdAt;
+          }
+        });
+    } else {
+      _data.createdAt = new Date();
+      return q.resolve();
+    }
+  }
 
   function update(data) {
     if (!data) {

@@ -530,12 +530,45 @@ function testSave() {
         console.log(err);
       });
     });
-  })
+    it('should have a new created on a new record with an id', function(done) {
+      var record = storage.createRecord('Example', 'someDataThatDoesNotExist');
+      record.save().then(function() {
+        expect(record.getData().createdAt).to.exist;
+        done();
+      });
+    });
+    it('should have a new created on a new record', function(done) {
+      var record = storage.createRecord('Example');
+      record.save().then(function() {
+        expect(record.getData().createdAt).to.exist;
+        done();
+      });
+    });
+    it('should fetch the old createdAt time on an existing record', function(done) {
+      var record = storage.createRecord('Example');
+      record.save().then(function() {
+        expect(record.getData().createdAt).to.exist;
+        setTimeout(function() {
+          var otherDate = new Date();
+          record.getData().createdAt = otherDate;
+          record.save().then(function() {
+            expect((otherDate.getTime() - record.getData().createdAt) > 1000).to.be.true;
+            done();
+          })
+        }, 3000);
+      });
+    });
+  });
 }
 
 function runTests() {
   describe('le-storage-service e2e tests', function() {
     this.timeout(10000);
+    before(function(done) {
+      firebaseRef.remove(function() {
+        done();
+      });
+    });
     after(function() {
       setTimeout(function() {
         process.exit(0);
