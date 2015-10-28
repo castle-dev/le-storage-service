@@ -224,6 +224,13 @@ var RecordService = function(provider, type, id) {
           } else {
             _data.createdAt = data.createdAt;
           }
+        }, function(err) {
+          if (err.message.indexOf('permission') === -1) {
+            return q.reject(err);
+          }
+          if (!_data.createdAt) {
+            _data.createdAt = new Date();
+          }
         });
     } else {
       _data.createdAt = new Date();
