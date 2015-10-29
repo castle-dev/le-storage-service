@@ -221,7 +221,7 @@ var RecordService = function(provider, type, id) {
         .then(function(data) {
           if (!data) {
             _data.createdAt = new Date();
-          } else {
+          } else if (data.createdAt) {
             _data.createdAt = data.createdAt;
           }
         }, function(err) {

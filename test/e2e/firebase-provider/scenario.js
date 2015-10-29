@@ -558,6 +558,17 @@ function testSave() {
         }, 3000);
       });
     });
+    it('should update the record without adding a createdAt if there is no createdAt', function(done) {
+      firebaseRef.child('examples/examplesID12345').set({
+        exampleData: 123
+      }, function() {
+        var record = storage.createRecord('Example', 'examplesID12345');
+        record.save().then(function() {
+          expect(record.getData().createdAt).not.to.exist;
+          done();
+        });
+      });
+    });
   });
 }
 
