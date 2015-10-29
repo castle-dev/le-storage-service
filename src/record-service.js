@@ -225,9 +225,7 @@ var RecordService = function(provider, type, id) {
             _data.createdAt = data.createdAt;
           }
         }, function(err) {
-          if (err.message.indexOf('permission') === -1) {
-            return q.reject(err);
-          }
+          console.log(err);
           if (!_data.createdAt) {
             _data.createdAt = new Date();
           }
