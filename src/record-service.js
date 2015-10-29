@@ -225,6 +225,7 @@ var RecordService = function(provider, type, id) {
             _data.createdAt = data.createdAt;
           }
         }, function(err) {
+          console.log(err);
           if (!_data.createdAt) {
             _data.createdAt = new Date();
           }
