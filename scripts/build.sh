@@ -3,9 +3,9 @@ type=$(git show | grep -oE '[^ ]+$' | tail -1)
 if [ $type = "major" ] || [ $type = "minor" ] || [ $type = "patch" ]
 then
 gulp bump:$type
+git remote set-url origin "https://${GH_TOKEN}@github.com/castle-dev/le-storage-service.git"
 git push origin develop
 git push origin develop --tags
-fi
 gulp docs
 cd docs
 git init
@@ -14,3 +14,4 @@ git checkout -B gh-pages
 git add .
 git commit -m "Updating documentation"
 git push origin gh-pages -fq > /dev/null
+fi
