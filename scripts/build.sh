@@ -2,6 +2,7 @@
 type=$(git show | grep -oE '[^ ]+$' | tail -1)
 if [ $type = "major" ] || [ $type = "minor" ] || [ $type = "patch" ]
 then
+git checkout develop
 gulp bump:$type
 git remote set-url origin "https://${GH_TOKEN}@github.com/castle-dev/le-storage-service.git"
 git push origin develop
