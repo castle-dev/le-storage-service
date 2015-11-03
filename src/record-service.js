@@ -255,7 +255,7 @@ var RecordService = function(provider, type, id) {
     _provider.load(pluralize(caseConverter.toCamelCase(_type)), _id)
       .then(function(data) {
         if (!data) {
-          deferred.reject(new Error('Specified record does not exist remotely'));
+          deferred.reject(new Error('Specified record does not exist remotely: ' + _type + ' ' + _id));
           return;
         }
         if (data.deletedAt) {
