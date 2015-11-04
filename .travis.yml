@@ -1,13 +1,20 @@
 language: node_js
 before_install:
-- npm install -g gulp mocha
-- npm install
-- npm test
+  - npm install -g gulp mocha
+  - npm install
+  - npm test
 install:
-- git config --global user.email "travis-ci@entercastle.com"
-- git config --global user.name "Travis Castle"
+  - 'git config --global user.email "travis-ci@entercastle.com"'
+  - 'git config --global user.name "Travis Castle"'
 script: ./scripts/build.sh
+deploy:
+  provider: npm
+  email: castle-dev@entercastle.com
+  api_key: '${NPM_TOKEN}'
+  on:
+    branch: master
 env:
   global:
     - secure: mUXdkL/tp2b9Yx78TL5/abmQ7PgiOG4BgOKDifhu0K0rY0UBgD5Jl0eTX3aFxUfRLpgA3/H07D7LBPE3ArsWu6H1ad166SfAMoLvqxaywShoW2cguf+A9BhO7wzwcHJ/Ocboz+kPeIaHKwvFCSbatQHyD2CdAkUdCS+83uiGE9U=
-    - FIREBASE_URL=https://le-firebase-test.firebaseio.com/
+    - 'FIREBASE_URL=https://le-firebase-test.firebaseio.com/'
+    - secure: XcNp3m2Tj8+LqiZ8jwVa5kI8mYNk17PY3D/wFxxZkUlgGz+FIJjZdIlRfQdX2ale4HclVyPAdDa66jQCmvY3ZRzwmmXBRDan7WaxXRRkYVZwpbNEcnL6oLOGitgWFr+ZXkQ19e9F+vjJUYd6j3LCOFnYYwCDpYicC/1MVWJlasc=
