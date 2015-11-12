@@ -272,19 +272,16 @@ var RecordService = function(provider, type, id) {
   };
 
   function deleteRecord() {
-    var deferred = q.defer();
-    this.load().then(function(data) {
-      _data.deletedAt = new Date();
-      save().then(function() {
-        deferred.resolve();
-      }, function(err) {
-        deferred.reject(err);
-      });
-
-    }, function(err) {
-      this.reject(err);
+    var record = this;
+    var collection = pluralize(caseConverter.toCamelCase(_type));
+    return record.load()
+    .then(function (data) {
+      data.deletedAt = new Date();
+      return record.update(data);
+    })
+    .then(function () {
+      return _provider.archive(collection, _id);
     });
-    return deferred.promise;
   }
 
   function sync(onDataChanged) {
