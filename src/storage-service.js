@@ -116,6 +116,24 @@ var StorageService = function(provider) {
     });
     return deferred.promise;
   }
+
+  /**
+   * updates the field for the specified record with the specified value
+   * @function updateField
+   * @memberof StorageService
+   * @instance
+   * @param {string} type the type of record to delete
+   * @param {string} id the id of the record
+   * @param {string} fieldName the name of the field to update
+   * @param {any} value the value to set on the field
+   * @returns promise resolves with the updatedRecord
+   */
+  this.updateField = function(type, id, fieldName, value) {
+    return this.fetchRecord(type, id).then(function(record) {
+      record.getData()[fieldName] = value;
+      return record.save();
+    });
+  }
 };
 
 module.exports = StorageService;
