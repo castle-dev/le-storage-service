@@ -479,7 +479,7 @@ var RecordService = function(provider, type, id) {
             })(joinConfigs[i].type, joinConfigs[i].many, joinConfigs[i].as);
           }
         }
-        return q.all(promises)
+        return q.allSettled(promises)
           .then(function() {
             return data;
           }, function(err) {
